@@ -3,6 +3,6 @@
   "name": "Thermal Vision",
   "documentation": "",
   "dependencies": [],
-  "codeowners": ["@EcHass"],
+  "codeowners": ["@eyalcha"],
   "requirements": ["colour", "numpy", "scipy", "pillow"]
 }
