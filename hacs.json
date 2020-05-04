@@ -1,0 +1,5 @@
+{
+  "name": "Thermal",
+  "domains": ["camera", "sensor"],
+  "homeassistant": "0.106.0"
+}

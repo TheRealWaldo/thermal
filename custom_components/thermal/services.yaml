@@ -1,0 +1,26 @@
+auto_scale:
+  description: Scale temperature range to current min / max
+  fields:
+    entity_id:
+      description: Camera or sensor entity id
+      example: camera.thermal
+
+# set_min_temperature:
+#   description: Set min temperature range
+#   fields:
+#     entity_id:
+#       description: Camera or sensor entity id
+#       example: camera.thermal
+#     temperature:
+#       description: Minimum temperature (0 - 80)
+#       example: 20.0
+
+# set_max_temperature:
+#   description: Set max temperature range
+#   fields:
+#     entity_id:
+#       description: Camera or sensor entity id
+#       example: camera.thermal
+#     temperature:
+#       description: Maximum temperature (0 - 80)
+#       example: 32.0

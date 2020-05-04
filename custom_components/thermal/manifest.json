@@ -1,0 +1,8 @@
+{
+  "domain": "thermal",
+  "name": "Thermal Vision",
+  "documentation": "",
+  "dependencies": [],
+  "codeowners": ["@EcHass"],
+  "requirements": ["colour", "numpy", "scipy", "pillow"]
+}
