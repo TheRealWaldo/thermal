@@ -1,6 +1,6 @@
 # Thermal 
 
-![Heat Map](https://github.com/EcHass/Thermal/raw/master/docs/heatmap.jpg)
+![Heat Map](https://github.com/eyalcha/thermal/raw/master/docs/heatmap.jpg)
 
 ## Features:
 
@@ -14,10 +14,10 @@
 
 ## Links
 
-- [Documentation](https://github.com/EcHass/Thermal)
-- [Configuration](https://github.com/EcHass/Thermal#configuration)
-- [Report a Bug](https://github.com/EcHass/Thermal/issues/new?template=issue.md)
-- [Suggest an idea](https://github.com/EcHass/Thermal/issues/new?template=feature_request.md)
+- [Documentation](https://github.com/eyalcha/thermal)
+- [Configuration](https://github.com/eyalcha/thermal#configuration)
+- [Report a Bug](https://github.com/eyalcha/thermal/issues/new?template=issue.md)
+- [Suggest an idea](https://github.com/eyalcha/thermal/issues/new?template=feature_request.md)
 
 ---
 
