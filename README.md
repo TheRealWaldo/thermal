@@ -168,6 +168,8 @@ The sensor attributes are (all values relates to configured roi):
 - Average temperature
 - Max temperature
 - Min temperature
+- Min index - The index where the min temperature was detected (1D)
+- Max index - The index where the max temperature was detected (1D)
 
 ## Advanced Configuration
 

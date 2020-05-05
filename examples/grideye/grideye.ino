@@ -1,10 +1,13 @@
 /*
+  This is an example sketch for Home Assisatnt Thermal integration.
+  
+  @Author: Eyal Cohen
 
   Pinouts
-  MCU         Device
-  D1          AMG SDA
-  D2          AMG SCL
-
+    MCU         Device
+    D1          AMG SDA
+    D2          AMG SCL
+    D5          Led
 */
 
 #include <Wire.h>
@@ -14,7 +17,11 @@
 #include <ArduinoOTA.h>
 #include <RemoteDebug.h>
 #include <ArduinoJson.h>
+#include <jled.h>
+
 #include "secrets.h"
+
+#define LED_RED D5
 
 static RemoteDebug Debug;
 
@@ -23,7 +30,10 @@ static float pixels[AMG88xx_PIXEL_ARRAY_SIZE];
 
 static ESP8266WebServer server(80);
 
-const char* hostName = "grideye1";
+static const char* hostName = "grideye1";
+
+auto ledRed = JLed(LED_RED);
+auto ledBuiltin = JLed(BUILTIN_LED);
 
 void wifiInit() {
   WiFi.mode(WIFI_STA);
@@ -88,6 +98,7 @@ void handleRaw() {
   String output;
   serializeJson(doc, output);
   server.send(200, "application/json", output.c_str());
+  ledRed.Blink(100, 100);
 }
 
 void handleNotFound() {
@@ -132,7 +143,12 @@ void setup() {
 
   Debug.begin(hostName);
 
-  // Let sensor boot up
+  pinMode(LED_RED, OUTPUT);
+  ledRed.Off();
+  pinMode(BUILTIN_LED, OUTPUT);
+  ledBuiltin.Blink(2000, 2000).Forever();
+
+  // Let thermal sensor boot up
   delay(100); 
 }
 
@@ -140,7 +156,9 @@ void loop() {
 
   // Wifi
   if (WiFi.status() != WL_CONNECTED) {
+    ledBuiltin.Stop();
     wifiConnect();
+    ledBuiltin.Blink(2000, 2000).Forever();
   }
 
   // OTA
@@ -151,4 +169,8 @@ void loop() {
 
   // Remote debug
   Debug.handle();
+
+  // Update leds
+  ledRed.Update();
+  ledBuiltin.Update();
 }
