@@ -82,11 +82,36 @@ Main Options
 | `height` | No | Image height in pixels **Default**: 640
 | `rotate` | No | Rotate image **Default**: 0
 | `mirror` | No | Mirror image true / false **Default**: false
+| `format` | No | Camera image format (`jpeg`, `png`) **Default**: jpeg
 | `min_temp` | No | Min temperature **Default**: 26
 | `max_temp` | No | Max temperature **Default**: 32
-| `method` | No | Interpolation method (`bicubic`, `linear`) **Default** bicubic
+| `sensor` | No | Sensor related configurations
+| `interpolate` | No | Interpolation related configurations
 | `cold_color` | No | Cold color **Default**: indigo
 | `hot_color` | No | Hot color **Default**: red
+
+Interpolate
+
+|Parameter |Required|Description
+|:---|---|---
+| `method` | No | Interpolation method (`bicubic`, `linear`) **Default** bicubic
+| `rows` | No | Number of rows in interpolated data **Default**: 32
+| `cols` | No | Number of columns of interpolated data **Default**: 32
+
+Sensor
+
+|Parameter |Required|Description
+|:---|---|---
+| `rows` | Yes | Number of rows in sensor data **Default**: 8
+| `cols` | Yes | Number of columns in sensor data **Default**: 8
+
+#### State and Attributes
+
+##### Attributes
+
+The camera attributes are:
+
+- FPS
 
 ### Sensor
 
@@ -126,9 +151,9 @@ ROI
 | `right` | Yes | Right pixel index [0:cols-1] **Default**: 7
 | `bottom` | Yes | Bottom pixel index [0:rows-1] **Default**: 7
 
-### State and Attributes
+#### State and Attributes
 
-#### State
+##### State
 
 The sensor state can be one of the following values (all values relates to configured roi):
 
@@ -136,7 +161,7 @@ The sensor state can be one of the following values (all values relates to confi
 - Max temperature
 - Min temperature
 
-#### Attributes
+##### Attributes
 
 The sensor attributes are (all values relates to configured roi):
 
@@ -156,7 +181,7 @@ You can also use this more advanced configuration example:
 sensor
   - platform: thermal
     name: My Thrermal
-    host: http://192.168.0.194
+    host: http://192.168.0.10
     scan_interval: 2
     sensor:
       rows: 8
@@ -177,7 +202,7 @@ sensor
 camera:
   platform: thermal
   name: My Camera
-  host: http://192.168.0.194
+  host: http://192.168.0.10
   min_temp: 20
   max_temp: 30
   mirror: True
