@@ -4,5 +4,5 @@
   "documentation": "",
   "dependencies": [],
   "codeowners": ["@eyalcha"],
-  "requirements": ["colour", "numpy", "scipy", "pillow"]
+  "requirements": ["colour", "numpy", "pillow"]
 }

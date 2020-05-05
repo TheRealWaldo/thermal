@@ -2,17 +2,22 @@
 
 import logging
 import asyncio
-
-import numpy as np
-
 import aiohttp
 import async_timeout
 import requests
+import io
+import math
+import time
+
+import numpy as np
+import voluptuous as vol
+
+from colour import Color
+from PIL import Image, ImageDraw
+
 from requests.auth import HTTPBasicAuth, HTTPDigestAuth
 
 from urllib.parse import urljoin
-
-import voluptuous as vol
 
 from homeassistant.helpers.aiohttp_client import (
     async_get_clientsession
@@ -20,7 +25,6 @@ from homeassistant.helpers.aiohttp_client import (
 
 from homeassistant.components.camera import PLATFORM_SCHEMA, Camera
 from homeassistant.helpers import config_validation as cv
-# from homeassistant.util import Throttle
 
 from homeassistant.const import (
   CONF_AUTHENTICATION,
@@ -33,17 +37,20 @@ from homeassistant.const import (
   HTTP_DIGEST_AUTHENTICATION
 )
 
-from .utils import interpolate_image
+from .utils import constrain, map_value
+from .interpolate import interpolate
+from .client import Client
 
 from .const import (
   SESSION_TIMEOUT,
   CONF_WIDTH, CONF_HEIGHT, CONF_METHOD,
   CONF_MIN_TEMPERATURE, CONF_MAX_TEMPERATURE,
-  CONF_ROTATE, CONF_MIRROR,
-  CONF_SENSOR, CONF_ROWS, CONF_COLS,
+  CONF_ROTATE, CONF_MIRROR, CONF_FORMAT,
+  CONF_COLD_COLOR, CONF_HOT_COLOR,
+  CONF_SENSOR, CONF_INTERPOLATE, CONF_ROWS, CONF_COLS,
   DEFAULT_NAME, DEFAULT_VERIFY_SSL, DEFAULT_IMAGE_WIDTH, DEFAULT_IMAGE_HEIGHT, DEFAULT_METHOD,
   DEFAULT_MIN_TEMPERATURE, DEFAULT_MAX_TEMPERATURE,
-  DEFAULT_ROTATE, DEFAULT_MIRROR,
+  DEFAULT_ROTATE, DEFAULT_MIRROR, DEFAULT_FORMAT,
   DEFAULT_ROWS, DEFAULT_COLS,
   DEFAULT_COLD_COLOR, DEFAULT_HOT_COLOR
 )
@@ -66,9 +73,16 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({
         vol.Required(CONF_ROWS): cv.positive_int,
         vol.Required(CONF_COLS): cv.positive_int,
         }),
-    vol.Optional(CONF_METHOD, default=DEFAULT_METHOD): cv.string,
+    vol.Optional(CONF_INTERPOLATE): vol.Schema({
+        vol.Optional(CONF_ROWS): cv.positive_int,
+        vol.Optional(CONF_COLS): cv.positive_int,
+        vol.Optional(CONF_METHOD, default=DEFAULT_METHOD): cv.string,
+        }),
+    vol.Optional(CONF_FORMAT, default=DEFAULT_FORMAT): cv.string,
     vol.Optional(CONF_MIRROR, default=DEFAULT_MIRROR): cv.boolean,
     vol.Optional(CONF_ROTATE, default=DEFAULT_ROTATE): cv.positive_int,
+    vol.Optional(CONF_COLD_COLOR, default=DEFAULT_COLD_COLOR): cv.string,
+    vol.Optional(CONF_HOT_COLOR, default=DEFAULT_HOT_COLOR): cv.string,
 })
 
 
@@ -80,35 +94,54 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
 class ThermalCamera(Camera):
     """A camera component producing thermal image from grid sensor data"""
 
-    def __init__(self, device_info):
+    def __init__(self, config):
         """Initialize the component."""
         super().__init__()
-        self._name = device_info.get(CONF_NAME)
+        self._name = config.get(CONF_NAME)
         _LOGGER.debug(f"Initialize Thermal camera {self._name}")
 
-        self._host = device_info.get(CONF_HOST)
-        
-        self._image_width = device_info.get(CONF_WIDTH)
-        self._image_height = device_info.get(CONF_HEIGHT)
-        self._min_temperature = device_info.get(CONF_MIN_TEMPERATURE)
-        self._max_temperature = device_info.get(CONF_MAX_TEMPERATURE)
-        self._color_depth = 1024
-        self._method = device_info.get(CONF_METHOD)
-        self._color_cold = DEFAULT_COLD_COLOR
-        self._color_hot = DEFAULT_HOT_COLOR
-        self._rows = DEFAULT_ROWS
-        self._cols = DEFAULT_COLS
-        self._rotate = device_info.get(CONF_ROTATE)
-        self._mirror = device_info.get(CONF_MIRROR)
+        self._host = config.get(CONF_HOST)
 
-        self._username = device_info.get(CONF_USERNAME)
-        self._password = device_info.get(CONF_PASSWORD)
-        self._authentication = device_info.get(CONF_AUTHENTICATION)        
+        self._image_width = config.get(CONF_WIDTH)
+        self._image_height = config.get(CONF_HEIGHT)
+        self._min_temperature = config.get(CONF_MIN_TEMPERATURE)
+        self._max_temperature = config.get(CONF_MAX_TEMPERATURE)
+        self._color_depth = 1024
+        self._rotate = config.get(CONF_ROTATE)
+        self._mirror = config.get(CONF_MIRROR)
+        self._format = config.get(CONF_FORMAT)
+
+        sensor = config.get(CONF_SENSOR, {
+            CONF_ROWS: DEFAULT_ROWS,
+            CONF_COLS: DEFAULT_COLS
+        })
+        self._rows = sensor.get(CONF_ROWS, DEFAULT_ROWS)
+        self._cols = sensor.get(CONF_COLS, DEFAULT_COLS)
+
+        interpolate = config.get(CONF_INTERPOLATE, {
+            CONF_ROWS: 32,
+            CONF_COLS: 32,
+            CONF_METHOD: DEFAULT_METHOD
+        })
+        self._interpolate_rows = interpolate.get(CONF_ROWS, 32)
+        self._interpolate_cols = interpolate.get(CONF_COLS, 32)
+        self._method = interpolate.get(CONF_METHOD, DEFAULT_METHOD)
+       
+        self._username = config.get(CONF_USERNAME)
+        self._password = config.get(CONF_PASSWORD)
+        self._authentication = config.get(CONF_AUTHENTICATION)        
         self._auth = None
         if self._username and self._password:
             if self._authentication == HTTP_BASIC_AUTHENTICATION:
                 self._auth = aiohttp.BasicAuth(self._username, password=self._password)
-        self._verify_ssl = device_info.get(CONF_VERIFY_SSL)
+        self._verify_ssl = config.get(CONF_VERIFY_SSL)
+
+        color_cold = config.get(CONF_COLD_COLOR)
+        color_hot = config.get(CONF_HOT_COLOR)
+        self._colors = list(Color(color_cold).range_to(Color(color_hot), self._color_depth))
+        self._colors = [(int(c.red * 255), int(c.green * 255), int(c.blue * 255)) for c in self._colors]
+
+        self._attributes = {}
 
     @property
     def name(self):
@@ -119,21 +152,76 @@ class ThermalCamera(Camera):
     def should_poll(self):
         return True
 
+    @property
+    def device_state_attributes(self):
+        """Return the camera state attributes."""
+        return self._attributes
+
     async def async_camera_image(self):
         """Pull image from camera"""
         websession = async_get_clientsession(self.hass, verify_ssl=self._verify_ssl)
         try:
             with async_timeout.timeout(SESSION_TIMEOUT):
-                # Get pixels
+                start = int(round(time.time() * 1000))
                 req_url = urljoin(self._host, 'raw')
                 response = await websession.get(req_url, auth=self._auth)
                 jsonResponse = await response.json()
-                # Convert to 2D
-                pixels = np.reshape(jsonResponse['data'].split(','), (self._rows, self._cols))
-                # Generate JPEG image
-                return interpolate_image(pixels, self._image_width, self._image_height,
-                    self._min_temperature, self._max_temperature, self._color_cold, self._color_hot,
-                    self._color_depth, self._method, self._rotate, self._mirror, "JPEG")
+                image = self._camera_image(jsonResponse['data'].split(','))
+                # Approx frame rate
+                fps = int(1000.0 / (int(round(time.time() * 1000)) - start))
+                self._attributes = {
+                    "fps": fps
+                }
+                return image
+        except asyncio.TimeoutError:
+            _LOGGER.error("Timeout getting camera image from %s", self._name)
+        except aiohttp.ClientError as err:
+            _LOGGER.error("Error getting new camera image from %s: %s", self._name, err)
         except Exception as err:
-            print(err)
-            _LOGGER.error("Failed to connect to camera")
+            _LOGGER.error("Failed to generate camera %s", err)
+
+    def camera_image(self):
+        client = Client(self._host)
+        return self._camera_image(client.get_raw())
+
+    def _camera_image(self, pixels):
+        """Create image from thermal camera pixels (temperatures)"""
+        # Map to colors depth range
+        pixels = [map_value(p, self._min_temperature, self._max_temperature, 0, self._color_depth - 1) for p in pixels]
+        # Convert to 2D
+        pixels = np.reshape(pixels, (self._rows, self._cols))
+        # Rotate (flip)
+        if self._rotate == 180:
+            pixels = np.flip(pixels, 0)
+        # Mirror
+        if self._mirror:
+            pixels = np.flip(pixels, 1)
+        # Input / output grid
+        xi = np.linspace(0, self._cols - 1, self._cols)
+        yi = np.linspace(0, self._rows - 1, self._rows)
+        xo = np.linspace(0, self._cols - 1, self._interpolate_cols)
+        yo = np.linspace(0, self._rows - 1, self._interpolate_rows)
+        # Interpolate
+        interpolation = interpolate(xi, yi, pixels, xo, yo, self._method)
+        # Draw surface
+        image = Image.new("RGB", (self._image_width, self._image_height))
+        draw = ImageDraw.Draw(image)
+        # Pixel size
+        pixel_width = self._image_width / self._interpolate_cols
+        pixel_height = self._image_height / self._interpolate_rows
+        # Draw intepolated image
+        for y, row in enumerate(interpolation):
+            for x, pixel in enumerate(row):
+                color_index = constrain(int(pixel), 0, self._color_depth - 1)
+                x0 = pixel_width * x
+                y0 = pixel_height * y
+                x1 = x0 + pixel_width
+                y1 = y0 + pixel_height
+                draw.rectangle(((x0, y0), (x1, y1)), fill=self._colors[color_index])
+        # Return image
+        with io.BytesIO() as output:
+            if self._format is "jpeg":
+                image.save(output, format=self._format, quality=80, optimize=True, progressive=True)
+            else:
+                image.save(output, format=self._format)
+            return output.getvalue() 
