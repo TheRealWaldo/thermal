@@ -1,0 +1,52 @@
+name: Pull actions
+
+on:
+  pull_request:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    name: Validate
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: HACS validation
+        uses: hacs/action@main
+        with:
+          category: integration
+          ignore: brands wheels hacs
+
+      - name: Hassfest validation
+        uses: home-assistant/actions/hassfest@master
+
+  style:
+    runs-on: ubuntu-latest
+    name: Check style formatting
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Setup node.js
+        uses: actions/setup-node@v2.1.5
+        with:
+          node-version: 14
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Pull request linter action
+        uses: JulienKode/pull-request-name-linter-action@v0.2.0
+
+      - name: Commit Linter
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: wagoid/commitlint-github-action@v3.1.4
+
+      - uses: actions/setup-python@v2.2.2
+        with:
+          python-version: "3.x"
+
+      - run: python3 -m pip install black
+
+      - run: black .
