@@ -1,5 +1,7 @@
 {
   "name": "Thermal",
+  "country": "CA",
   "domains": ["camera", "sensor"],
-  "homeassistant": "0.106.0"
+  "render_readme": true,
+  "iot_class": ["Assumed State", "Local Polling"]
 }
