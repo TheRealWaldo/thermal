@@ -1,0 +1,35 @@
+version: 2
+updates:
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "daily"
+      timezone: "America/Edmonton"
+      time: "09:00"
+    commit-message:
+      prefix: "chore(dep): "
+    assignees:
+      - TheRealWaldo
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "daily"
+      timezone: "America/Edmonton"
+      time: "09:00"
+    commit-message:
+      prefix: "ci(dep): "
+    assignees:
+      - TheRealWaldo
+
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "daily"
+      timezone: "America/Edmonton"
+      time: "09:00"
+    commit-message:
+      prefix-development: "ci(dep): "
+      prefix: "chore(dep): "
+    assignees:
+      - TheRealWaldo
