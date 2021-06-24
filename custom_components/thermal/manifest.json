@@ -2,7 +2,7 @@
   "domain": "thermal",
   "name": "Thermal Vision",
   "issue_tracker": "https://github.com/TheRealWaldo/thermal/issues",
-  "documentation": "https://github.com/TheRealWaldo/thermal/blob/master/README.md",
+  "documentation": "https://github.com/TheRealWaldo/thermal/blob/main/README.md",
   "dependencies": [],
   "version": "1.0.0",
   "codeowners": [
