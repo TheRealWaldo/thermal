@@ -3,7 +3,7 @@ default_config:
 logger:
   default: info
   logs:
-    custom_components.ha_optimal_humidity: debug
+    custom_components.thermal: debug
 
 # If you need to debug uncommment the line below (doc: https://www.home-assistant.io/integrations/debugpy/)
 # debugpy:
@@ -26,3 +26,4 @@ camera:
     name: Prototype Thermal Sensor
     host: http://192.168.3.91
     scan_interval: 2
+    auto_range: true

@@ -42,6 +42,7 @@ from .const import (
     CONF_WIDTH,
     CONF_HEIGHT,
     CONF_METHOD,
+    CONF_AUTO_RANGE,
     CONF_MIN_TEMPERATURE,
     CONF_MAX_TEMPERATURE,
     CONF_ROTATE,
@@ -78,6 +79,7 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
         vol.Optional(CONF_VERIFY_SSL, default=DEFAULT_VERIFY_SSL): cv.boolean,
         vol.Optional(CONF_WIDTH, default=DEFAULT_IMAGE_WIDTH): cv.positive_int,
         vol.Optional(CONF_HEIGHT, default=DEFAULT_IMAGE_HEIGHT): cv.positive_int,
+        vol.Optional(CONF_AUTO_RANGE, default=False): cv.boolean,
         vol.Optional(CONF_MIN_TEMPERATURE, default=DEFAULT_MIN_TEMPERATURE): vol.All(
             vol.Coerce(float), vol.Range(min=0, max=100), msg="invalid min temperature"
         ),
@@ -148,6 +150,7 @@ class ThermalCamera(Camera):
         self._username = config.get(CONF_USERNAME)
         self._password = config.get(CONF_PASSWORD)
         self._authentication = config.get(CONF_AUTHENTICATION)
+        self._auto_range = config.get(CONF_AUTO_RANGE)
         self._auth = None
         if self._username and self._password:
             if self._authentication == HTTP_BASIC_AUTHENTICATION:
@@ -165,10 +168,7 @@ class ThermalCamera(Camera):
         ]
 
         self._attributes = {}
-
-        self._default_image = self._camera_image(
-            np.full(self._rows * self._cols, self._min_temperature)
-        )
+        self._setup_default_image()
 
     @property
     def name(self):
@@ -192,7 +192,9 @@ class ThermalCamera(Camera):
                 start = int(round(time.time() * 1000))
                 response = await websession.get(self._host, auth=self._auth)
                 jsonResponse = await response.json()
-                image = self._camera_image(jsonResponse["data"].split(","))
+                data = jsonResponse["data"].split(",")
+                self._setup_range(data)
+                image = self._camera_image(data)
                 # Approx frame rate
                 fps = int(1000.0 / (int(round(time.time() * 1000)) - start))
                 self._attributes = {"fps": fps}
@@ -208,6 +210,29 @@ class ThermalCamera(Camera):
     def camera_image(self):
         client = Client(self._host)
         return self._camera_image(client.get_raw())
+
+    def _setup_range(self, pixels):
+        if self._auto_range:
+            min_temp = float(min(pixels))
+            max_temp = float(max(pixels))
+            _LOGGER.debug("Minimum temperature %s", min_temp)
+            _LOGGER.debug("Maximum temperature %s", max_temp)
+            if (
+                min_temp != max_temp
+                and max_temp > min_temp
+                and not (
+                    min_temp == self._min_temperature
+                    and max_temp == self._max_temperature
+                )
+            ):
+                self._min_temperature = min_temp
+                self._max_temperature = max_temp
+                self._setup_default_image()
+
+    def _setup_default_image(self):
+        self._default_image = self._camera_image(
+            np.full(self._rows * self._cols, self._min_temperature)
+        )
 
     def _camera_image(self, pixels):
         """Create image from thermal camera pixels (temperatures)"""
