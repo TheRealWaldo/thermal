@@ -1,0 +1,47 @@
+name: Release
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  release-action:
+    runs-on: ubuntu-latest
+    name: Release action
+    if: "github.ref == 'refs/heads/main' && !contains(toJSON(github.event.commits.*.message), 'chore(release)')"
+    steps:
+      - name: Setup node.js
+        uses: actions/setup-node@v2.1.5
+        with:
+          node-version: 14
+
+      - name: Checkout
+        uses: actions/checkout@v2.3.4
+        with:
+          fetch-depth: 0
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Bump version
+        id: bump-version
+        uses: TheRealWaldo/release-it@v0.3.0
+        with:
+          github-token: ${{ secrets.AUTO_PAT }}
+          github-username: TRW-bot
+          git-user-name: TheRealWaldo-bot
+          git-user-email: github-bot@inwr.com
+          create-branch: release
+          rebase-onto: main
+
+      - name: Create pull request
+        uses: repo-sync/pull-request@v2.6
+        with:
+          github_token: ${{ secrets.AUTO_PAT }}
+          source_branch: release
+          destination_branch: main
+          pr_draft: true
+          pr_assignee: TheRealWaldo
+          pr_title: "chore(release): ${{steps.bump-version.outputs.version}}"
+          pr_body: ${{steps.bump-version.outputs.changelog}}
