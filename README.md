@@ -35,37 +35,37 @@ camera:
 
 |Parameter |Required|Description
 |:---|---|---
-| `platform` | Yes | Platfrom name
-| `name` | No | Friendly name **Default**: Thermal
-| `host` | Yes | IP address of your Thermal sensor server
-| `verify_ssl` | No | Verify SSL or not **Default**: false
-| `width` | No | Image width in pixels **Default**: 640
-| `height` | No | Image height in pixels **Default**: 640
-| `rotate` | No | Rotate image **Default**: 0
-| `mirror` | No | Mirror image true / false **Default**: false
-| `format` | No | Camera image format (`jpeg`, `png`) **Default**: jpeg
-| `min_temp` | No | Min temperature **Default**: 26
-| `max_temp` | No | Max temperature **Default**: 32
-| `auto_range` | No | Rather than use a static minimum and maximum temperature, auto adjust based on the content ***Default***: false
-| `sensor` | No | Sensor related configurations
-| `interpolate` | No | Interpolation related configurations
-| `cold_color` | No | Cold color **Default**: indigo
-| `hot_color` | No | Hot color **Default**: red
+| `platform` | Yes | Platform name
+| `name` | No | Friendly name **Default**: `Thermal`
+| `host` | Yes | IP address or hostname of your Thermal sensor server
+| `verify_ssl` | No | Verify SSL or not **Default**: `false`
+| `width` | No | Image width in pixels **Default**: `640`
+| `height` | No | Image height in pixels **Default**: `640`
+| `rotate` | No | Rotate image **Default**: `0`
+| `mirror` | No | Mirror image true / false **Default**: `false`
+| `format` | No | Camera image format (`jpeg`, `png`) **Default**: `jpeg`
+| `min_temp` | No | Min temperature **Default**: `26`
+| `max_temp` | No | Max temperature **Default**: `32`
+| `auto_range` | No | Rather than use a static minimum and maximum temperature, auto adjust based on the content ***Default***: `false`
+| `sensor` | No | Sensor related configurations (see below)
+| `interpolate` | No | Interpolation related configurations (see below)
+| `cold_color` | No | Cold color **Default**: `indigo`
+| `hot_color` | No | Hot color **Default**: `red`
 
 Interpolate
 
 |Parameter |Required|Description
 |:---|---|---
-| `method` | No | Interpolation method (`bicubic`, `linear`) **Default**: bicubic
-| `rows` | No | Number of rows in interpolated data **Default**: 32
-| `cols` | No | Number of columns of interpolated data **Default**: 32
+| `method` | No | Interpolation method (`bicubic`, `linear`) **Default**: `bicubic`
+| `rows` | No | Number of rows in interpolated data **Default**: `32`
+| `cols` | No | Number of columns of interpolated data **Default**: `32`
 
 Sensor
 
 |Parameter |Required|Description
 |:---|---|---
-| `rows` | Yes | Number of rows in sensor data **Default**: 8
-| `cols` | Yes | Number of columns in sensor data **Default**: 8
+| `rows` | No | Number of rows in sensor data **Default**: `8`
+| `cols` | No | Number of columns in sensor data **Default**: `8`
 
 #### State and Attributes
 
@@ -91,30 +91,30 @@ sensor:
 
 |Parameter |Required|Description
 |:---|---|---
-| `platform` | No | Platfrom name
-| `name` | No | Friendly name **Default**: Thermal
+| `platform` | Yes | Platform name
+| `name` | No | Friendly name **Default**: `Thermal`
 | `host` | Yes | IP address of your Thermal sensor server
-| `verify_ssl` | No | Verify SSL or not **Default**: false
-| `scan_interval` | No | Get raw data interval **Default**: 60 seconds
-| `sensor` | No | Sensor related configurations
-| `roi` | No | Sensor region of interest
-| `state` | No | Sensor state type (`average`, `max`, `min`) **Default**: average
+| `verify_ssl` | No | Verify SSL or not **Default**: `false`
+| `scan_interval` | No | Get raw data interval in seconds **Default**: `60`
+| `sensor` | No | Sensor related configurations (see below)
+| `roi` | No | Sensor region of interest (see below)
+| `state` | No | Sensor state type (`average`, `max`, `min`) **Default**: `average`
 
 Sensor
 
 |Parameter |Required|Description
 |:---|---|---
-| `rows` | Yes | Number of rows in sensor data **Default**: 8
-| `cols` | Yes | Number of columns in sensor data **Default**: 8
+| `rows` | No | Number of rows in sensor data **Default**: `8`
+| `cols` | No | Number of columns in sensor data **Default**: `8`
 
 ROI
 
 |Parameter |Required|Description
 |:---|---|---
-| `left` | Yes | Left pixel index [0:cols-1] **Default**: 0
-| `top` | Yes | Top pixel index [0:rows-1] **Default**: 0
-| `right` | Yes | Right pixel index [0:cols-1] **Default**: 7
-| `bottom` | Yes | Bottom pixel index [0:rows-1] **Default**: 7
+| `left` | No | Left pixel index [0:cols-1] **Default**: `0`
+| `top` | No | Top pixel index [0:rows-1] **Default**: `0`
+| `right` | No | Right pixel index [0:cols-1] **Default**: `7`
+| `bottom` | No | Bottom pixel index [0:rows-1] **Default**: `7`
 
 #### State and Attributes
 
