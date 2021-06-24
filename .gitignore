@@ -1,1 +1,11 @@
 __pycache__/
+pythonenv*
+venv
+.venv
+.coverage
+.idea
+
+node_modules
+node_modules/*
+
+.DS_Store
