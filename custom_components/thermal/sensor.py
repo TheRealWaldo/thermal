@@ -20,6 +20,7 @@ from homeassistant.const import (
     CONF_SCAN_INTERVAL,
     DEVICE_CLASS_TEMPERATURE,
     TEMP_CELSIUS,
+    CONF_VERIFY_SSL,
 )
 
 from .const import (
@@ -37,6 +38,7 @@ from .const import (
     DEFAULT_STATE,
     DEFAULT_ROWS,
     DEFAULT_COLS,
+    DEFAULT_VERIFY_SSL,
 )
 
 from .client import Client
@@ -48,6 +50,7 @@ PLATFORM_SCHEMA = vol.All(
         {
             vol.Required(CONF_HOST): cv.url,
             vol.Optional(CONF_NAME, default=DEFAULT_NAME): cv.string,
+            vol.Optional(CONF_VERIFY_SSL, default=DEFAULT_VERIFY_SSL): cv.boolean,
             vol.Optional(CONF_SCAN_INTERVAL): cv.time_period,
             vol.Optional(CONF_STATE, default=DEFAULT_STATE): cv.string,
             vol.Optional(CONF_ROI): vol.Schema(
@@ -71,6 +74,7 @@ PLATFORM_SCHEMA = vol.All(
 
 async def async_setup_platform(hass, config, async_add_entities, discovery_info=None):
     """Set up the sensor platform."""
+    _LOGGER.debug("async setup Thermal sensor")
     async_add_entities([ThermalSensor(hass, config)])
 
 
@@ -83,7 +87,8 @@ class ThermalSensor(Entity):
         self._name = config.get(CONF_NAME)
         _LOGGER.debug(f"Initialize Thermal sensor {self._name}")
 
-        self._client = Client(config.get(CONF_HOST))
+        self._verify_ssl = config.get(CONF_VERIFY_SSL)
+        self._client = Client(config.get(CONF_HOST), self._verify_ssl)
 
         self._state = None
         self._icon = "mdi:grid"

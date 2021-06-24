@@ -38,6 +38,7 @@ camera:
 | `platform` | Yes | Platfrom name
 | `name` | No | Friendly name **Default**: Thermal
 | `host` | Yes | IP address of your Thermal sensor server
+| `verify_ssl` | No | Verify SSL or not **Default**: false
 | `width` | No | Image width in pixels **Default**: 640
 | `height` | No | Image height in pixels **Default**: 640
 | `rotate` | No | Rotate image **Default**: 0
@@ -93,6 +94,7 @@ sensor:
 | `platform` | No | Platfrom name
 | `name` | No | Friendly name **Default**: Thermal
 | `host` | Yes | IP address of your Thermal sensor server
+| `verify_ssl` | No | Verify SSL or not **Default**: false
 | `scan_interval` | No | Get raw data interval **Default**: 60 seconds
 | `sensor` | No | Sensor related configurations
 | `roi` | No | Sensor region of interest
