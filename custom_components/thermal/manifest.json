@@ -1,6 +1,7 @@
 {
   "domain": "thermal",
   "name": "Thermal Vision",
+  "issue_tracker": "https://github.com/TheRealWaldo/thermal/issues",
   "documentation": "",
   "dependencies": [],
   "version": "1.0.0",
