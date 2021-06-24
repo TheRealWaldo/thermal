@@ -9,14 +9,9 @@ from homeassistant.const import (
     ATTR_ENTITY_ID,
 )
 
-from .const import (
-  DOMAIN,
-  SERVICE_AUTO_SCALE
-)
+from .const import DOMAIN, SERVICE_AUTO_SCALE
 
-AUTO_SCALE_SERVICE_SCHEMA = vol.Schema({
-    vol.Required(ATTR_ENTITY_ID): cv.entity_ids
-})
+AUTO_SCALE_SERVICE_SCHEMA = vol.Schema({vol.Required(ATTR_ENTITY_ID): cv.entity_ids})
 
 _LOGGER = logging.getLogger(__name__)
 

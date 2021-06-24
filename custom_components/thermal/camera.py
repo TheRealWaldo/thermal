@@ -4,9 +4,8 @@ import logging
 import asyncio
 import aiohttp
 import async_timeout
-import requests
+
 import io
-import math
 import time
 
 import numpy as np
@@ -19,22 +18,19 @@ from requests.auth import HTTPBasicAuth, HTTPDigestAuth
 
 from urllib.parse import urljoin
 
-from homeassistant.helpers.aiohttp_client import (
-    async_get_clientsession
-)
+from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
 from homeassistant.components.camera import PLATFORM_SCHEMA, Camera
 from homeassistant.helpers import config_validation as cv
 
 from homeassistant.const import (
-  CONF_AUTHENTICATION,
-  CONF_HOST,
-  CONF_NAME,
-  CONF_PASSWORD,
-  CONF_USERNAME,
-  CONF_VERIFY_SSL,
-  HTTP_BASIC_AUTHENTICATION,
-  HTTP_DIGEST_AUTHENTICATION
+    CONF_AUTHENTICATION,
+    CONF_HOST,
+    CONF_NAME,
+    CONF_PASSWORD,
+    CONF_USERNAME,
+    CONF_VERIFY_SSL,
+    HTTP_BASIC_AUTHENTICATION,
 )
 
 from .utils import constrain, map_value
@@ -42,48 +38,72 @@ from .interpolate import interpolate
 from .client import Client
 
 from .const import (
-  SESSION_TIMEOUT,
-  CONF_WIDTH, CONF_HEIGHT, CONF_METHOD,
-  CONF_MIN_TEMPERATURE, CONF_MAX_TEMPERATURE,
-  CONF_ROTATE, CONF_MIRROR, CONF_FORMAT,
-  CONF_COLD_COLOR, CONF_HOT_COLOR,
-  CONF_SENSOR, CONF_INTERPOLATE, CONF_ROWS, CONF_COLS,
-  DEFAULT_NAME, DEFAULT_VERIFY_SSL, DEFAULT_IMAGE_WIDTH, DEFAULT_IMAGE_HEIGHT, DEFAULT_METHOD,
-  DEFAULT_MIN_TEMPERATURE, DEFAULT_MAX_TEMPERATURE,
-  DEFAULT_ROTATE, DEFAULT_MIRROR, DEFAULT_FORMAT,
-  DEFAULT_ROWS, DEFAULT_COLS,
-  DEFAULT_COLD_COLOR, DEFAULT_HOT_COLOR
+    SESSION_TIMEOUT,
+    CONF_WIDTH,
+    CONF_HEIGHT,
+    CONF_METHOD,
+    CONF_MIN_TEMPERATURE,
+    CONF_MAX_TEMPERATURE,
+    CONF_ROTATE,
+    CONF_MIRROR,
+    CONF_FORMAT,
+    CONF_COLD_COLOR,
+    CONF_HOT_COLOR,
+    CONF_SENSOR,
+    CONF_INTERPOLATE,
+    CONF_ROWS,
+    CONF_COLS,
+    DEFAULT_NAME,
+    DEFAULT_VERIFY_SSL,
+    DEFAULT_IMAGE_WIDTH,
+    DEFAULT_IMAGE_HEIGHT,
+    DEFAULT_METHOD,
+    DEFAULT_MIN_TEMPERATURE,
+    DEFAULT_MAX_TEMPERATURE,
+    DEFAULT_ROTATE,
+    DEFAULT_MIRROR,
+    DEFAULT_FORMAT,
+    DEFAULT_ROWS,
+    DEFAULT_COLS,
+    DEFAULT_COLD_COLOR,
+    DEFAULT_HOT_COLOR,
 )
 
 _LOGGER = logging.getLogger(__name__)
 
-PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({
-    vol.Required(CONF_HOST): cv.url,
-    vol.Optional(CONF_NAME, default=DEFAULT_NAME): cv.string,
-    vol.Optional(CONF_VERIFY_SSL, default=DEFAULT_VERIFY_SSL): cv.boolean,
-    vol.Optional(CONF_WIDTH, default=DEFAULT_IMAGE_WIDTH): cv.positive_int,
-    vol.Optional(CONF_HEIGHT, default=DEFAULT_IMAGE_HEIGHT): cv.positive_int,
-    vol.Optional(CONF_MIN_TEMPERATURE, default=DEFAULT_MIN_TEMPERATURE): vol.All(
-        vol.Coerce(float), vol.Range(min=0, max=100), msg="invalid min temperature"
-    ),
-    vol.Optional(CONF_MAX_TEMPERATURE, default=DEFAULT_MAX_TEMPERATURE): vol.All(
-        vol.Coerce(float), vol.Range(min=0, max=100), msg="invalid max temperature"
-    ),
-    vol.Optional(CONF_SENSOR): vol.Schema({
-        vol.Required(CONF_ROWS): cv.positive_int,
-        vol.Required(CONF_COLS): cv.positive_int,
-        }),
-    vol.Optional(CONF_INTERPOLATE): vol.Schema({
-        vol.Optional(CONF_ROWS): cv.positive_int,
-        vol.Optional(CONF_COLS): cv.positive_int,
-        vol.Optional(CONF_METHOD, default=DEFAULT_METHOD): cv.string,
-        }),
-    vol.Optional(CONF_FORMAT, default=DEFAULT_FORMAT): cv.string,
-    vol.Optional(CONF_MIRROR, default=DEFAULT_MIRROR): cv.boolean,
-    vol.Optional(CONF_ROTATE, default=DEFAULT_ROTATE): cv.positive_int,
-    vol.Optional(CONF_COLD_COLOR, default=DEFAULT_COLD_COLOR): cv.string,
-    vol.Optional(CONF_HOT_COLOR, default=DEFAULT_HOT_COLOR): cv.string,
-})
+PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
+    {
+        vol.Required(CONF_HOST): cv.url,
+        vol.Optional(CONF_NAME, default=DEFAULT_NAME): cv.string,
+        vol.Optional(CONF_VERIFY_SSL, default=DEFAULT_VERIFY_SSL): cv.boolean,
+        vol.Optional(CONF_WIDTH, default=DEFAULT_IMAGE_WIDTH): cv.positive_int,
+        vol.Optional(CONF_HEIGHT, default=DEFAULT_IMAGE_HEIGHT): cv.positive_int,
+        vol.Optional(CONF_MIN_TEMPERATURE, default=DEFAULT_MIN_TEMPERATURE): vol.All(
+            vol.Coerce(float), vol.Range(min=0, max=100), msg="invalid min temperature"
+        ),
+        vol.Optional(CONF_MAX_TEMPERATURE, default=DEFAULT_MAX_TEMPERATURE): vol.All(
+            vol.Coerce(float), vol.Range(min=0, max=100), msg="invalid max temperature"
+        ),
+        vol.Optional(CONF_SENSOR): vol.Schema(
+            {
+                vol.Required(CONF_ROWS): cv.positive_int,
+                vol.Required(CONF_COLS): cv.positive_int,
+            }
+        ),
+        vol.Optional(CONF_INTERPOLATE): vol.Schema(
+            {
+                vol.Optional(CONF_ROWS): cv.positive_int,
+                vol.Optional(CONF_COLS): cv.positive_int,
+                vol.Optional(CONF_METHOD, default=DEFAULT_METHOD): cv.string,
+            }
+        ),
+        vol.Optional(CONF_FORMAT, default=DEFAULT_FORMAT): cv.string,
+        vol.Optional(CONF_MIRROR, default=DEFAULT_MIRROR): cv.boolean,
+        vol.Optional(CONF_ROTATE, default=DEFAULT_ROTATE): cv.positive_int,
+        vol.Optional(CONF_COLD_COLOR, default=DEFAULT_COLD_COLOR): cv.string,
+        vol.Optional(CONF_HOT_COLOR, default=DEFAULT_HOT_COLOR): cv.string,
+    }
+)
 
 
 async def async_setup_platform(hass, config, async_add_entities, discovery_info=None):
@@ -111,25 +131,23 @@ class ThermalCamera(Camera):
         self._mirror = config.get(CONF_MIRROR)
         self._format = config.get(CONF_FORMAT)
 
-        sensor = config.get(CONF_SENSOR, {
-            CONF_ROWS: DEFAULT_ROWS,
-            CONF_COLS: DEFAULT_COLS
-        })
+        sensor = config.get(
+            CONF_SENSOR, {CONF_ROWS: DEFAULT_ROWS, CONF_COLS: DEFAULT_COLS}
+        )
         self._rows = sensor.get(CONF_ROWS, DEFAULT_ROWS)
         self._cols = sensor.get(CONF_COLS, DEFAULT_COLS)
 
-        interpolate = config.get(CONF_INTERPOLATE, {
-            CONF_ROWS: 32,
-            CONF_COLS: 32,
-            CONF_METHOD: DEFAULT_METHOD
-        })
+        interpolate = config.get(
+            CONF_INTERPOLATE,
+            {CONF_ROWS: 32, CONF_COLS: 32, CONF_METHOD: DEFAULT_METHOD},
+        )
         self._interpolate_rows = interpolate.get(CONF_ROWS, 32)
         self._interpolate_cols = interpolate.get(CONF_COLS, 32)
         self._method = interpolate.get(CONF_METHOD, DEFAULT_METHOD)
-       
+
         self._username = config.get(CONF_USERNAME)
         self._password = config.get(CONF_PASSWORD)
-        self._authentication = config.get(CONF_AUTHENTICATION)        
+        self._authentication = config.get(CONF_AUTHENTICATION)
         self._auth = None
         if self._username and self._password:
             if self._authentication == HTTP_BASIC_AUTHENTICATION:
@@ -138,10 +156,19 @@ class ThermalCamera(Camera):
 
         color_cold = config.get(CONF_COLD_COLOR)
         color_hot = config.get(CONF_HOT_COLOR)
-        self._colors = list(Color(color_cold).range_to(Color(color_hot), self._color_depth))
-        self._colors = [(int(c.red * 255), int(c.green * 255), int(c.blue * 255)) for c in self._colors]
+        self._colors = list(
+            Color(color_cold).range_to(Color(color_hot), self._color_depth)
+        )
+        self._colors = [
+            (int(c.red * 255), int(c.green * 255), int(c.blue * 255))
+            for c in self._colors
+        ]
 
         self._attributes = {}
+
+        self._default_image = self._camera_image(
+            np.full(self._rows * self._cols, self._min_temperature)
+        )
 
     @property
     def name(self):
@@ -163,18 +190,16 @@ class ThermalCamera(Camera):
         try:
             with async_timeout.timeout(SESSION_TIMEOUT):
                 start = int(round(time.time() * 1000))
-                req_url = urljoin(self._host, 'raw')
-                response = await websession.get(req_url, auth=self._auth)
+                response = await websession.get(self._host, auth=self._auth)
                 jsonResponse = await response.json()
-                image = self._camera_image(jsonResponse['data'].split(','))
+                image = self._camera_image(jsonResponse["data"].split(","))
                 # Approx frame rate
                 fps = int(1000.0 / (int(round(time.time() * 1000)) - start))
-                self._attributes = {
-                    "fps": fps
-                }
+                self._attributes = {"fps": fps}
                 return image
         except asyncio.TimeoutError:
-            _LOGGER.error("Timeout getting camera image from %s", self._name)
+            _LOGGER.warning("Timeout getting camera image from %s", self._name)
+            return self._default_image
         except aiohttp.ClientError as err:
             _LOGGER.error("Error getting new camera image from %s: %s", self._name, err)
         except Exception as err:
@@ -187,7 +212,16 @@ class ThermalCamera(Camera):
     def _camera_image(self, pixels):
         """Create image from thermal camera pixels (temperatures)"""
         # Map to colors depth range
-        pixels = [map_value(p, self._min_temperature, self._max_temperature, 0, self._color_depth - 1) for p in pixels]
+        pixels = [
+            map_value(
+                p,
+                self._min_temperature,
+                self._max_temperature,
+                0,
+                self._color_depth - 1,
+            )
+            for p in pixels
+        ]
         # Convert to 2D
         pixels = np.reshape(pixels, (self._rows, self._cols))
         # Rotate (flip)
@@ -221,7 +255,13 @@ class ThermalCamera(Camera):
         # Return image
         with io.BytesIO() as output:
             if self._format is "jpeg":
-                image.save(output, format=self._format, quality=80, optimize=True, progressive=True)
+                image.save(
+                    output,
+                    format=self._format,
+                    quality=80,
+                    optimize=True,
+                    progressive=True,
+                )
             else:
                 image.save(output, format=self._format)
-            return output.getvalue() 
+            return output.getvalue()

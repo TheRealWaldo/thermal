@@ -3,7 +3,7 @@
 DOMAIN = "thermal"
 
 VERSION = "1.0.0"
-ISSUE_URL = "https://github.com/eyalcha/thermal/issues"
+ISSUE_URL = "https://github.com/TheRealWaldo/thermal/issues"
 
 CONF_WIDTH = "width"
 CONF_HEIGHT = "height"
@@ -37,10 +37,11 @@ DEFAULT_STATE = "average"
 DEFAULT_ROWS = 8
 DEFAULT_COLS = 8
 DEFAULT_ROTATE = 0
-DEFAULT_MIRROR = False
+DEFAULT_MIRROR = True
 DEFAULT_COLD_COLOR = "indigo"
 DEFAULT_HOT_COLOR = "red"
 DEFAULT_FORMAT = "jpeg"
+DEFAULT_SCAN_INTERVAL = 60
 
 SERVICE_AUTO_SCALE = "auto_scale"
 
