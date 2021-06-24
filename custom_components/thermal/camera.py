@@ -14,10 +14,6 @@ import voluptuous as vol
 from colour import Color
 from PIL import Image, ImageDraw
 
-from requests.auth import HTTPBasicAuth, HTTPDigestAuth
-
-from urllib.parse import urljoin
-
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
 from homeassistant.components.camera import PLATFORM_SCHEMA, Camera
