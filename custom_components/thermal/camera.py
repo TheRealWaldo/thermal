@@ -197,7 +197,11 @@ class ThermalCamera(Camera):
                 image = self._camera_image(data)
                 # Approx frame rate
                 fps = int(1000.0 / (int(round(time.time() * 1000)) - start))
-                self._attributes = {"fps": fps}
+                self._attributes = {
+                    "fps": fps,
+                    "min": self._min_temperature,
+                    "max": self._max_temperature,
+                }
                 return image
         except asyncio.TimeoutError:
             _LOGGER.warning("Timeout getting camera image from %s", self._name)
