@@ -27,6 +27,7 @@ from homeassistant.const import (
 
 from .utils import constrain, map_value
 from .interpolate import interpolate
+from urllib.parse import urljoin
 from .client import Client
 
 from .const import (
@@ -177,7 +178,7 @@ class ThermalCamera(Camera):
         try:
             with async_timeout.timeout(SESSION_TIMEOUT):
                 start = int(round(time.time() * 1000))
-                response = await websession.get(self._host)
+                response = await websession.get(urljoin(self._host, "raw"))
                 jsonResponse = await response.json()
                 data = jsonResponse["data"].split(",")
                 self._setup_range(data)
