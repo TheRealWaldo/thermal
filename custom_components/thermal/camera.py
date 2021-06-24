@@ -102,6 +102,7 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
 
 async def async_setup_platform(hass, config, async_add_entities, discovery_info=None):
     """Set up camera component."""
+    _LOGGER.debug("async setup Thermal camera")
     async_add_entities([ThermalCamera(config)])
 
 
@@ -162,7 +163,8 @@ class ThermalCamera(Camera):
 
     @property
     def should_poll(self):
-        return True
+        """No need to poll cameras."""
+        return False
 
     @property
     def device_state_attributes(self):
@@ -197,7 +199,7 @@ class ThermalCamera(Camera):
             _LOGGER.error("Failed to generate camera %s", err)
 
     def camera_image(self):
-        client = Client(self._host)
+        client = Client(self._host, self._verify_ssl)
         return self._camera_image(client.get_raw())
 
     def _setup_range(self, pixels):

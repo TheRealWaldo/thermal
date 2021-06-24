@@ -23,7 +23,7 @@ sensor:
 
 camera:
   - platform: thermal
-    name: Prototype Thermal Sensor
+    name: Prototype Thermal Camera
     host: http://192.168.3.91
     scan_interval: 2
     auto_range: true
