@@ -168,8 +168,8 @@ class ThermalSensor(Entity):
             ]
             # Temperature statistics
             average_temp = np.average(pixels)
-            min_temp = np.amax(pixels)
-            max_temp = np.amin(pixels)
+            min_temp = np.amin(pixels)
+            max_temp = np.amax(pixels)
             # Indexs
             min_index = np.argmin(pixels).item()
             max_index = np.argmax(pixels).item()
