@@ -1,7 +1,6 @@
 """Thermal grid sensor"""
 
 import logging
-import requests
 
 import numpy as np
 
@@ -26,10 +25,19 @@ from homeassistant.const import (
 
 from .const import (
     CONF_STATE,
-    CONF_ROI, CONF_LEFT, CONF_TOP, CONF_RIGHT, CONF_BOTTOM,
-    CONF_SENSOR, CONF_ROWS, CONF_COLS,
-    DEFAULT_NAME, DEFAULT_STATE,
-    DEFAULT_ROWS, DEFAULT_COLS
+    CONF_ROI,
+    CONF_LEFT,
+    CONF_TOP,
+    CONF_RIGHT,
+    CONF_BOTTOM,
+    CONF_SENSOR,
+    CONF_ROWS,
+    CONF_COLS,
+    DEFAULT_NAME,
+    DEFAULT_SCAN_INTERVAL,
+    DEFAULT_STATE,
+    DEFAULT_ROWS,
+    DEFAULT_COLS,
 )
 
 from .client import Client
@@ -37,25 +45,29 @@ from .client import Client
 _LOGGER = logging.getLogger(__name__)
 
 PLATFORM_SCHEMA = vol.All(
-    PLATFORM_SCHEMA.extend({
-        vol.Required(CONF_HOST): cv.url,
-        vol.Optional(CONF_NAME, default=DEFAULT_NAME): cv.string,
-        vol.Optional(CONF_SCAN_INTERVAL): cv.time_period, 
-        vol.Optional(CONF_STATE, DEFAULT_STATE): cv.string, 
-        vol.Optional(CONF_ROI): vol.Schema({
-            vol.Required(CONF_LEFT): cv.positive_int,
-            vol.Required(CONF_TOP): cv.positive_int,
-            vol.Required(CONF_RIGHT): cv.positive_int,
-            vol.Required(CONF_BOTTOM): cv.positive_int,
-            }),
-        vol.Optional(CONF_SENSOR): vol.Schema({
-            vol.Required(CONF_ROWS): cv.positive_int,
-            vol.Required(CONF_COLS): cv.positive_int,
-            })
-    })
+    PLATFORM_SCHEMA.extend(
+        {
+            vol.Required(CONF_HOST): cv.url,
+            vol.Optional(CONF_NAME, default=DEFAULT_NAME): cv.string,
+            vol.Optional(CONF_SCAN_INTERVAL): cv.time_period,
+            vol.Optional(CONF_STATE, default=DEFAULT_STATE): cv.string,
+            vol.Optional(CONF_ROI): vol.Schema(
+                {
+                    vol.Required(CONF_LEFT): cv.positive_int,
+                    vol.Required(CONF_TOP): cv.positive_int,
+                    vol.Required(CONF_RIGHT): cv.positive_int,
+                    vol.Required(CONF_BOTTOM): cv.positive_int,
+                }
+            ),
+            vol.Optional(CONF_SENSOR): vol.Schema(
+                {
+                    vol.Required(CONF_ROWS, default=DEFAULT_ROWS): cv.positive_int,
+                    vol.Required(CONF_COLS, default=DEFAULT_COLS): cv.positive_int,
+                }
+            ),
+        }
+    )
 )
-
-SCAN_INTERVAL = timedelta(seconds=60)
 
 
 async def async_setup_platform(hass, config, async_add_entities, discovery_info=None):
@@ -75,32 +87,38 @@ class ThermalSensor(Entity):
         self._client = Client(config.get(CONF_HOST))
 
         self._state = None
-        self._icon = 'mdi:grid'
+        self._icon = "mdi:grid"
         self._attributes = {}
-        
+
         self._state_type = config.get(CONF_STATE)
 
         sensor = config.get(CONF_SENSOR)
-        self._rows = sensor.get(CONF_ROWS, DEFAULT_ROWS)
-        self._cols = sensor.get(CONF_COLS, DEFAULT_COLS)
-        
+        if sensor:
+            self._rows = sensor.get(CONF_ROWS, DEFAULT_ROWS)
+            self._cols = sensor.get(CONF_COLS, DEFAULT_COLS)
+        else:
+            self._rows = DEFAULT_ROWS
+            self._cols = DEFAULT_COLS
+
         roi = config.get(CONF_ROI)
         if roi:
             self._roi = {
-                'left': roi[CONF_LEFT],
-                'top': roi[CONF_TOP],
-                'right': roi[CONF_RIGHT],
-                'bottom': roi[CONF_BOTTOM]
+                "left": roi[CONF_LEFT],
+                "top": roi[CONF_TOP],
+                "right": roi[CONF_RIGHT],
+                "bottom": roi[CONF_BOTTOM],
             }
         else:
             self._roi = {
-                'left': 0,
-                'top': 0,
-                'right': self._cols - 1,
-                'bottom': self._rows - 1             
+                "left": 0,
+                "top": 0,
+                "right": self._cols - 1,
+                "bottom": self._rows - 1,
             }
 
-        interval = config.get(CONF_SCAN_INTERVAL, SCAN_INTERVAL)
+        interval = config.get(
+            CONF_SCAN_INTERVAL, timedelta(seconds=DEFAULT_SCAN_INTERVAL)
+        )
         self.update = Throttle(interval)(self._update)
 
     @property
@@ -145,8 +163,8 @@ class ThermalSensor(Entity):
             pixels = np.reshape(pixels, (self._rows, self._cols))
             # Extracy ROI
             pixels = pixels[
-                self._roi['top']:self._roi['bottom'] + 1,
-                self._roi['left']:self._roi['right'] + 1
+                self._roi["top"] : self._roi["bottom"] + 1,
+                self._roi["left"] : self._roi["right"] + 1,
             ]
             # Temperature statistics
             average_temp = np.average(pixels)
@@ -157,15 +175,15 @@ class ThermalSensor(Entity):
             max_index = np.argmax(pixels).item()
             # Calculate statistics
             self._attributes = {
-                'average': average_temp,
-                'min': min_temp,
-                'max': max_temp,
-                'min_index': min_index,
-                'max_index': max_index,
+                "average": average_temp,
+                "min": min_temp,
+                "max": max_temp,
+                "min_index": min_index,
+                "max_index": max_index,
             }
-            if self._state_type == 'max':
+            if self._state_type == "max":
                 self._state = max_temp
-            elif self._state_type == 'min':
+            elif self._state_type == "min":
                 self._state = min_temp
             else:
                 self._state = average_temp
