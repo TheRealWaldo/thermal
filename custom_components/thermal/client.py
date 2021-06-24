@@ -2,6 +2,8 @@
 
 import requests
 
+# from urllib.parse import urljoin
+
 
 class Client(object):
     def __init__(self, base_url, username=None, password=None, verify_ssl=False):

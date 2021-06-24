@@ -20,13 +20,9 @@ from homeassistant.components.camera import PLATFORM_SCHEMA, Camera
 from homeassistant.helpers import config_validation as cv
 
 from homeassistant.const import (
-    CONF_AUTHENTICATION,
     CONF_HOST,
     CONF_NAME,
-    CONF_PASSWORD,
-    CONF_USERNAME,
     CONF_VERIFY_SSL,
-    HTTP_BASIC_AUTHENTICATION,
 )
 
 from .utils import constrain, map_value
@@ -143,14 +139,7 @@ class ThermalCamera(Camera):
         self._interpolate_cols = interpolate.get(CONF_COLS, 32)
         self._method = interpolate.get(CONF_METHOD, DEFAULT_METHOD)
 
-        self._username = config.get(CONF_USERNAME)
-        self._password = config.get(CONF_PASSWORD)
-        self._authentication = config.get(CONF_AUTHENTICATION)
         self._auto_range = config.get(CONF_AUTO_RANGE)
-        self._auth = None
-        if self._username and self._password:
-            if self._authentication == HTTP_BASIC_AUTHENTICATION:
-                self._auth = aiohttp.BasicAuth(self._username, password=self._password)
         self._verify_ssl = config.get(CONF_VERIFY_SSL)
 
         color_cold = config.get(CONF_COLD_COLOR)
@@ -186,7 +175,7 @@ class ThermalCamera(Camera):
         try:
             with async_timeout.timeout(SESSION_TIMEOUT):
                 start = int(round(time.time() * 1000))
-                response = await websession.get(self._host, auth=self._auth)
+                response = await websession.get(self._host)
                 jsonResponse = await response.json()
                 data = jsonResponse["data"].split(",")
                 self._setup_range(data)
