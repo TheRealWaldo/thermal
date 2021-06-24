@@ -6,9 +6,6 @@ import numpy as np
 def bicubic(xi, yi, values, xo, yo):
     z = np.zeros((xo.size, yo.size))
 
-    deltax = xi[1] - xi[0]
-    deltay = yi[1] - yi[0]
-
     for n, x in enumerate(xo):
         for m, y in enumerate(yo):
 
@@ -31,12 +28,12 @@ def bicubic(xi, yi, values, xo, yo):
                 f02 = values[i - 1, j + 1]  # row0 col2 >> x2,y0
 
                 f10 = values[i, j - 1]  # row1 col0 >> x0,y1
-                f11 = p00 = values[i, j]  # row1 col1 >> x1,y1
-                f12 = p01 = values[i, j + 1]  # row1 col2 >> x2,y1
+                f11 = values[i, j]  # row1 col1 >> x1,y1
+                f12 = values[i, j + 1]  # row1 col2 >> x2,y1
 
                 f20 = values[i + 1, j - 1]  # row2 col0 >> x0,y2
-                f21 = p10 = values[i + 1, j]  # row2 col1 >> x1,y2
-                f22 = p11 = values[i + 1, j + 1]  # row2 col2 >> x2,y2
+                f21 = values[i + 1, j]  # row2 col1 >> x1,y2
+                f22 = values[i + 1, j + 1]  # row2 col2 >> x2,y2
 
                 if 0 < i < xi.size - 2 and 0 < j < yi.size - 2:
 
