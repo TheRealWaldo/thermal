@@ -5,7 +5,7 @@
 [![GitHub Activity][commits-shield]][commits]
 [![License][license-shield]](LICENSE)
 
-This is a rework of [eyalcha/thermal](https://github.com/eyalcha/thermal) that corrects a number of issues and adds new functionality.
+This is a rework of [eyalcha/thermal](https://github.com/eyalcha/thermal) that corrects a number of issues, makes it compatible with HA 2016.6 forward, and adds new functionality.
 
 ## Installation
 
@@ -18,6 +18,119 @@ This is a rework of [eyalcha/thermal](https://github.com/eyalcha/thermal) that c
    installation.
 3. Configure the `thermal` sensor and/or camera.
 4. Restart Home Assistant.
+
+## Configuration
+
+### Camera
+
+```yaml
+# Example configuration.yaml entry
+
+camera:
+  - platform: thermal
+    host: http://192.168.0.10
+```
+
+#### Main Options
+
+|Parameter |Required|Description
+|:---|---|---
+| `platform` | Yes | Platfrom name
+| `name` | No | Friendly name **Default**: Thermal
+| `host` | Yes | IP address of your Thermal sensor server
+| `width` | No | Image width in pixels **Default**: 640
+| `height` | No | Image height in pixels **Default**: 640
+| `rotate` | No | Rotate image **Default**: 0
+| `mirror` | No | Mirror image true / false **Default**: false
+| `format` | No | Camera image format (`jpeg`, `png`) **Default**: jpeg
+| `min_temp` | No | Min temperature **Default**: 26
+| `max_temp` | No | Max temperature **Default**: 32
+| `auto_range` | No | Rather than use a static minimum and maximum temperature, auto adjust based on the content ***Default***: false
+| `sensor` | No | Sensor related configurations
+| `interpolate` | No | Interpolation related configurations
+| `cold_color` | No | Cold color **Default**: indigo
+| `hot_color` | No | Hot color **Default**: red
+
+Interpolate
+
+|Parameter |Required|Description
+|:---|---|---
+| `method` | No | Interpolation method (`bicubic`, `linear`) **Default**: bicubic
+| `rows` | No | Number of rows in interpolated data **Default**: 32
+| `cols` | No | Number of columns of interpolated data **Default**: 32
+
+Sensor
+
+|Parameter |Required|Description
+|:---|---|---
+| `rows` | Yes | Number of rows in sensor data **Default**: 8
+| `cols` | Yes | Number of columns in sensor data **Default**: 8
+
+#### State and Attributes
+
+##### Attributes
+
+|Attribute |Description
+|:---|---
+| `fps` | Approximate frames per second based on response time of sensor
+| `min` | Minimum value represented by the `cold_color` in the image
+| `max` | Maximum value represented by the `hot_color` in the image
+
+### Sensor
+
+```yaml
+# Example configuration.yaml entry
+
+sensor:
+  - platform: thermal
+    host: http://192.168.0.10
+```
+
+#### Main Options
+
+|Parameter |Required|Description
+|:---|---|---
+| `platform` | No | Platfrom name
+| `name` | No | Friendly name **Default**: Thermal
+| `host` | Yes | IP address of your Thermal sensor server
+| `scan_interval` | No | Get raw data interval **Default**: 60 seconds
+| `sensor` | No | Sensor related configurations
+| `roi` | No | Sensor region of interest
+| `state` | No | Sensor state type (`average`, `max`, `min`) **Default**: average
+
+Sensor
+
+|Parameter |Required|Description
+|:---|---|---
+| `rows` | Yes | Number of rows in sensor data **Default**: 8
+| `cols` | Yes | Number of columns in sensor data **Default**: 8
+
+ROI
+
+|Parameter |Required|Description
+|:---|---|---
+| `left` | Yes | Left pixel index [0:cols-1] **Default**: 0
+| `top` | Yes | Top pixel index [0:rows-1] **Default**: 0
+| `right` | Yes | Right pixel index [0:cols-1] **Default**: 7
+| `bottom` | Yes | Bottom pixel index [0:rows-1] **Default**: 7
+
+#### State and Attributes
+
+##### State
+
+The sensor state can be either `average`, `max`, or `min` based on `state` in the configuration.  It defaults to `average`.
+
+##### Attributes
+
+All values are affected by the ROI configuration.
+
+|Attribute |Description
+|:---|---
+| `average` | Average temperature of all pixels in current capture
+| `max` | Maximum temperature of all pixels in current capture
+| `min` | Min temperature of all pixels in current capture
+| `min_index` | The index where the min temperature was detected (1 Dimensional)
+| `max_index` | The index where the max temperature was detected (1 Dimensional)
 
 [commits]: https://github.com/TheRealWaldo/thermal/commits/main
 [commits-shield]: https://img.shields.io/github/commit-activity/m/therealwaldo/thermal?style=for-the-badge
