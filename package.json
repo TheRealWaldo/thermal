@@ -1,0 +1,25 @@
+{
+  "name": "thermal",
+  "version": "0.0.1",
+  "private": true,
+  "description": "CI Dependencies for thermal",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TheRealWaldo/thermal.git"
+  },
+  "author": "TheRealWaldo",
+  "license": "APACHE",
+  "bugs": {
+    "url": "https://github.com/TheRealWaldo/thermal/issues"
+  },
+  "homepage": "https://github.com/TheRealWaldo/thermal#readme",
+  "devDependencies": {
+    "@commitlint/config-conventional": "^12.1.4",
+    "@release-it/bumper": "^2.0.0",
+    "@release-it/conventional-changelog": "^3.0.1",
+    "release-it": "^14.10.0"
+  }
+}
