@@ -31,7 +31,9 @@ from urllib.parse import urljoin
 from .client import Client
 
 from .const import (
+    CONF_OVERLAY,
     CONF_SESSION_TIMEOUT,
+    DEFAULT_OVERLAY,
     DEFAULT_SESSION_TIMEOUT,
     CONF_WIDTH,
     CONF_HEIGHT,
@@ -101,6 +103,7 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
         vol.Optional(
             CONF_SESSION_TIMEOUT, default=DEFAULT_SESSION_TIMEOUT
         ): cv.positive_int,
+        vol.Optional(CONF_OVERLAY, default=DEFAULT_OVERLAY): cv.boolean,
     }
 )
 
@@ -126,11 +129,15 @@ class ThermalCamera(Camera):
         self._image_height = config.get(CONF_HEIGHT)
         self._min_temperature = config.get(CONF_MIN_TEMPERATURE)
         self._max_temperature = config.get(CONF_MAX_TEMPERATURE)
+        self._pixel_min_temp = self._min_temperature
+        self._pixel_max_temp = self._min_temperature
         self._color_depth = 1024
         self._rotate = config.get(CONF_ROTATE)
         self._mirror = config.get(CONF_MIRROR)
         self._format = config.get(CONF_FORMAT)
         self._session_timeout = config.get(CONF_SESSION_TIMEOUT)
+        self._overlay = config.get(CONF_OVERLAY)
+        self._fps = 0
 
         sensor = config.get(
             CONF_SENSOR, {CONF_ROWS: DEFAULT_ROWS, CONF_COLS: DEFAULT_COLS}
@@ -159,7 +166,6 @@ class ThermalCamera(Camera):
             for c in self._colors
         ]
 
-        self._attributes = {}
         self._setup_default_image()
 
     @property
@@ -169,13 +175,19 @@ class ThermalCamera(Camera):
 
     @property
     def should_poll(self):
-        """No need to poll cameras."""
-        return False
+        """Need to poll for attributes."""
+        return True
 
     @property
     def device_state_attributes(self):
         """Return the camera state attributes."""
-        return self._attributes
+        return {
+            "fps": self._fps,
+            "min": self._pixel_min_temp,
+            "max": self._pixel_max_temp,
+            "range_min": self._min_temperature,
+            "range_max": self._max_temperature,
+        }
 
     async def async_camera_image(self):
         """Pull image from camera"""
@@ -192,12 +204,7 @@ class ThermalCamera(Camera):
                 else:
                     return self._default_image
                 # Approx frame rate
-                fps = int(1000.0 / (int(round(time.time() * 1000)) - start))
-                self._attributes = {
-                    "fps": fps,
-                    "min": self._min_temperature,
-                    "max": self._max_temperature,
-                }
+                self._fps = int(1000.0 / (int(round(time.time() * 1000)) - start))
                 return image
         except asyncio.TimeoutError:
             _LOGGER.warning("Timeout getting camera image from %s", self._name)
@@ -214,21 +221,21 @@ class ThermalCamera(Camera):
         return self._camera_image(client.get_raw())
 
     def _setup_range(self, pixels):
+        self._pixel_min_temp = float(min(pixels))
+        self._pixel_max_temp = float(max(pixels))
         if self._auto_range:
-            min_temp = float(min(pixels))
-            max_temp = float(max(pixels))
-            _LOGGER.debug("Minimum temperature %s", min_temp)
-            _LOGGER.debug("Maximum temperature %s", max_temp)
+            _LOGGER.debug("Minimum temperature %s", self._pixel_min_temp)
+            _LOGGER.debug("Maximum temperature %s", self._pixel_max_temp)
             if (
-                min_temp != max_temp
-                and max_temp > min_temp
+                self._pixel_min_temp != self._pixel_max_temp
+                and self._pixel_max_temp > self._pixel_min_temp
                 and not (
-                    min_temp == self._min_temperature
-                    and max_temp == self._max_temperature
+                    self._pixel_min_temp == self._min_temperature
+                    and self._pixel_max_temp == self._max_temperature
                 )
             ):
-                self._min_temperature = min_temp
-                self._max_temperature = max_temp
+                self._min_temperature = self._pixel_min_temp
+                self._max_temperature = self._pixel_max_temp
                 self._setup_default_image()
 
     def _setup_default_image(self):
@@ -279,6 +286,15 @@ class ThermalCamera(Camera):
                 x1 = x0 + pixel_width
                 y1 = y0 + pixel_height
                 draw.rectangle(((x0, y0), (x1, y1)), fill=self._colors[color_index])
+
+        # Add overlay
+        if self._overlay:
+            draw.multiline_text(
+                (10, 10),
+                f"Min: {self._pixel_min_temp}\nMax: {self._pixel_max_temp}\nRange: {self._min_temperature} - {self._max_temperature}",
+                fill=(255, 255, 0),
+            )
+
         # Return image
         with io.BytesIO() as output:
             if self._format is "jpeg":
