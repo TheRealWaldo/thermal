@@ -28,3 +28,4 @@ camera:
     scan_interval: 2
     auto_range: true
     mirror: true
+    overlay: true
