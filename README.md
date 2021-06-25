@@ -135,6 +135,7 @@ All values are affected by the ROI configuration.
 | `min` | Min temperature of all pixels in current capture
 | `min_index` | The index where the min temperature was detected (1 Dimensional)
 | `max_index` | The index where the max temperature was detected (1 Dimensional)
+| `sensor_temp` | The temperature of the sensor itself (if the sensor provides it)
 
 [commits]: https://github.com/TheRealWaldo/thermal/commits/main
 [commits-shield]: https://img.shields.io/github/commit-activity/m/therealwaldo/thermal?style=for-the-badge

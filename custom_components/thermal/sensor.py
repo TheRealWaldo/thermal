@@ -161,29 +161,30 @@ class ThermalSensor(Entity):
 
     def _update(self) -> None:
         try:
-            # Get 1d array of sensor pixels
+            self._client.call()
             pixels = self._client.get_raw()
-            # Convert to 2D
+
             pixels = np.reshape(pixels, (self._rows, self._cols))
-            # Extracy ROI
+
             pixels = pixels[
                 self._roi["top"] : self._roi["bottom"] + 1,
                 self._roi["left"] : self._roi["right"] + 1,
             ]
-            # Temperature statistics
+
             average_temp = np.average(pixels)
             min_temp = np.amin(pixels)
             max_temp = np.amax(pixels)
-            # Indexs
+
             min_index = np.argmin(pixels).item()
             max_index = np.argmax(pixels).item()
-            # Calculate statistics
+
             self._attributes = {
                 "average": average_temp,
                 "min": min_temp,
                 "max": max_temp,
                 "min_index": min_index,
                 "max_index": max_index,
+                "sensor_temp": self._client.get_temp(),
             }
             if self._state_type == "max":
                 self._state = max_temp
