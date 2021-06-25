@@ -51,6 +51,7 @@ camera:
 | `interpolate` | No | Interpolation related configurations (see below)
 | `cold_color` | No | Cold color **Default**: `indigo`
 | `hot_color` | No | Hot color **Default**: `red`
+| `session_timeout` | No | Timeout in seconds for polling Thermal sensor server **Default**: `2`
 
 Interpolate
 

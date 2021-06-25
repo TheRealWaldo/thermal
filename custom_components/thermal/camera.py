@@ -31,7 +31,8 @@ from urllib.parse import urljoin
 from .client import Client
 
 from .const import (
-    SESSION_TIMEOUT,
+    CONF_SESSION_TIMEOUT,
+    DEFAULT_SESSION_TIMEOUT,
     CONF_WIDTH,
     CONF_HEIGHT,
     CONF_METHOD,
@@ -97,6 +98,9 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
         vol.Optional(CONF_ROTATE, default=DEFAULT_ROTATE): cv.positive_int,
         vol.Optional(CONF_COLD_COLOR, default=DEFAULT_COLD_COLOR): cv.string,
         vol.Optional(CONF_HOT_COLOR, default=DEFAULT_HOT_COLOR): cv.string,
+        vol.Optional(
+            CONF_SESSION_TIMEOUT, default=DEFAULT_SESSION_TIMEOUT
+        ): cv.positive_int,
     }
 )
 
@@ -126,6 +130,7 @@ class ThermalCamera(Camera):
         self._rotate = config.get(CONF_ROTATE)
         self._mirror = config.get(CONF_MIRROR)
         self._format = config.get(CONF_FORMAT)
+        self._session_timeout = config.get(CONF_SESSION_TIMEOUT)
 
         sensor = config.get(
             CONF_SENSOR, {CONF_ROWS: DEFAULT_ROWS, CONF_COLS: DEFAULT_COLS}
@@ -176,7 +181,7 @@ class ThermalCamera(Camera):
         """Pull image from camera"""
         websession = async_get_clientsession(self.hass, verify_ssl=self._verify_ssl)
         try:
-            with async_timeout.timeout(SESSION_TIMEOUT):
+            with async_timeout.timeout(self._session_timeout):
                 start = int(round(time.time() * 1000))
                 response = await websession.get(urljoin(self._host, "raw"))
                 jsonResponse = await response.json()
