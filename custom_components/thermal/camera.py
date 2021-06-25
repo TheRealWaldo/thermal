@@ -137,7 +137,7 @@ class ThermalCamera(Camera):
         self._format = config.get(CONF_FORMAT)
         self._session_timeout = config.get(CONF_SESSION_TIMEOUT)
         self._overlay = config.get(CONF_OVERLAY)
-        self._fps = 0
+        self._fps = None
 
         sensor = config.get(
             CONF_SENSOR, {CONF_ROWS: DEFAULT_ROWS, CONF_COLS: DEFAULT_COLS}
