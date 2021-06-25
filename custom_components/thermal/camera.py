@@ -297,7 +297,7 @@ class ThermalCamera(Camera):
 
         # Return image
         with io.BytesIO() as output:
-            if self._format is "jpeg":
+            if self._format == "jpeg":
                 image.save(
                     output,
                     format=self._format,
