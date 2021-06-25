@@ -180,9 +180,12 @@ class ThermalCamera(Camera):
                 start = int(round(time.time() * 1000))
                 response = await websession.get(urljoin(self._host, "raw"))
                 jsonResponse = await response.json()
-                data = jsonResponse["data"].split(",")
-                self._setup_range(data)
-                image = self._camera_image(data)
+                if jsonResponse:
+                    data = jsonResponse["data"].split(",")
+                    self._setup_range(data)
+                    image = self._camera_image(data)
+                else:
+                    return self._default_image
                 # Approx frame rate
                 fps = int(1000.0 / (int(round(time.time() * 1000)) - start))
                 self._attributes = {
@@ -196,8 +199,10 @@ class ThermalCamera(Camera):
             return self._default_image
         except aiohttp.ClientError as err:
             _LOGGER.error("Error getting new camera image from %s: %s", self._name, err)
+            return self._default_image
         except Exception as err:
-            _LOGGER.error("Failed to generate camera %s", err)
+            _LOGGER.error("Failed to generate camera (%s)", err)
+            return self._default_image
 
     def camera_image(self):
         client = Client(self._host, self._verify_ssl)
