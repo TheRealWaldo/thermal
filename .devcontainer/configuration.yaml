@@ -27,3 +27,4 @@ camera:
     host: http://192.168.3.91
     scan_interval: 2
     auto_range: true
+    mirror: true
