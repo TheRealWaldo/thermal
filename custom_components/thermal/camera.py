@@ -218,6 +218,7 @@ class ThermalCamera(Camera):
 
     def camera_image(self):
         client = Client(self._host, self._verify_ssl)
+        client.call()
         return self._camera_image(client.get_raw())
 
     def _setup_range(self, pixels):

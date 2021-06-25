@@ -11,7 +11,10 @@ class Client(object):
         self._base_url = base_url
         self._verify_ssl = verify_ssl
 
-    def get_raw(self):
+        self._pixels = None
+        self._temp = None
+
+    def call(self):
         response = requests.get(
             urljoin(self._base_url, "raw"),
             stream=True,
@@ -19,4 +22,15 @@ class Client(object):
             verify=self._verify_ssl,
         )
         response.raise_for_status()
-        return list(map(lambda x: float(x), response.json()["data"].split(",")))
+        decoded = response.json()
+
+        if decoded["temp"]:
+            self._temp = decoded["temp"]
+
+        self._pixels = list(map(lambda x: float(x), decoded["data"].split(",")))
+
+    def get_temp(self):
+        return self._temp
+
+    def get_raw(self):
+        return self._pixels
