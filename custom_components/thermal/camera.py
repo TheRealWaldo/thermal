@@ -191,30 +191,31 @@ class ThermalCamera(Camera):
 
     async def async_camera_image(self):
         """Pull image from camera"""
+        start = int(round(time.time() * 1000))
         websession = async_get_clientsession(self.hass, verify_ssl=self._verify_ssl)
         try:
             with async_timeout.timeout(self._session_timeout):
-                start = int(round(time.time() * 1000))
                 response = await websession.get(urljoin(self._host, "raw"))
                 jsonResponse = await response.json()
                 if jsonResponse:
                     data = jsonResponse["data"].split(",")
                     self._setup_range(data)
-                    image = self._camera_image(data)
-                else:
-                    return self._default_image
-                # Approx frame rate
-                self._fps = int(1000.0 / (int(round(time.time() * 1000)) - start))
-                return image
+                    self._default_image = self._camera_image(data)
+
         except asyncio.TimeoutError:
             _LOGGER.warning("Timeout getting camera image from %s", self._name)
             return self._default_image
+
         except aiohttp.ClientError as err:
             _LOGGER.error("Error getting new camera image from %s: %s", self._name, err)
             return self._default_image
+
         except Exception as err:
             _LOGGER.error("Failed to generate camera (%s)", err)
             return self._default_image
+
+        self._fps = int(1000.0 / (int(round(time.time() * 1000)) - start))
+        return self._default_image
 
     def camera_image(self):
         client = Client(self._host, self._verify_ssl)
@@ -237,7 +238,6 @@ class ThermalCamera(Camera):
             ):
                 self._min_temperature = self._pixel_min_temp
                 self._max_temperature = self._pixel_max_temp
-                self._setup_default_image()
 
     def _setup_default_image(self):
         self._default_image = self._camera_image(
