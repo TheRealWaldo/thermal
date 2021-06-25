@@ -165,7 +165,7 @@ class ThermalCamera(Camera):
             (int(c.red * 255), int(c.green * 255), int(c.blue * 255))
             for c in self._colors
         ]
-
+        self._client = Client(self._host, self._verify_ssl)
         self._setup_default_image()
 
     @property
@@ -218,9 +218,8 @@ class ThermalCamera(Camera):
         return self._default_image
 
     def camera_image(self):
-        client = Client(self._host, self._verify_ssl)
-        client.call()
-        return self._camera_image(client.get_raw())
+        self._client.call()
+        return self._camera_image(self._client.get_raw())
 
     def _setup_range(self, pixels):
         self._pixel_min_temp = float(min(pixels))
