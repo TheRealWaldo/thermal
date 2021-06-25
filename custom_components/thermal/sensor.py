@@ -192,5 +192,5 @@ class ThermalSensor(Entity):
                 self._state = min_temp
             else:
                 self._state = average_temp
-        except Exception as e:
+        except Exception:
             self._state = None
