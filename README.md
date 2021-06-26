@@ -9,6 +9,10 @@ This is a rework of [eyalcha/thermal](https://github.com/eyalcha/thermal) that c
 
 ## Installation
 
+### INSTALLATION VIA HACS
+
+Follow the instructions at https://hacs.xyz/docs/faq/custom_repositories/ using the URL https://github.com/TheRealWaldo/thermal
+
 ### MANUAL INSTALLATION
 
 1. Download the zip file from
