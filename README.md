@@ -9,10 +9,12 @@ This is a rework of [eyalcha/thermal](https://github.com/eyalcha/thermal) that c
 
 ## Differences
 
-This is not a complete list:
+This is may not be a complete list:
 
 - The platform/domain name is `thermal_vision` instead of `thermal`
 - More resilient connections
+- Fixes https://github.com/eyalcha/thermal/issues/1 https://github.com/eyalcha/thermal/issues/2 https://github.com/eyalcha/thermal/issues/5 https://github.com/eyalcha/thermal/issues/6
+- Works with HA 2016.6 and up
 - Optional auto-ranging capabilities
 - Optional in-camera overlay of metrics
 
