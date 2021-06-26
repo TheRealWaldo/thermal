@@ -167,6 +167,6 @@ All values are affected by the ROI configuration.
 [commits-shield]: https://img.shields.io/github/commit-activity/m/therealwaldo/thermal?style=for-the-badge
 [license-shield]: https://img.shields.io/github/license/therealwaldo/thermal.svg?style=for-the-badge
 [hacs]: https://github.com/custom-components/hacs
-[hacsbadge]: https://img.shields.io/badge/HACS-Custom-orange.svg?style=for-the-badge
+[hacsbadge]: https://img.shields.io/badge/HACS-Default-orange.svg?style=for-the-badge
 [releases-shield]: https://img.shields.io/github/v/release/therealwaldo/thermal?include_prereleases&style=for-the-badge
 [releases]: https://github.com/TheRealWaldo/thermal/releases
