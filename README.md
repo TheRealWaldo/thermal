@@ -5,6 +5,12 @@
 [![GitHub Activity][commits-shield]][commits]
 [![License][license-shield]](LICENSE)
 
+The Thermal Vision integration allows for the use of the [AMG8833 sensor](https://eu.industrial.panasonic.com/products/sensors-optical-devices/sensors-automotive-and-industrial-applications/infrared-array/series/grid-eye-high-performance-type-amg8833/ADI8005/model/AMG8833) with a simple JSON interface to be used within [Home Assistant](https://www.home-assistant.io/).
+
+This can be used to detect humans much more reliably than motion sensors as it does not require the subject to be moving.  It also produces a pretty thermal camera!
+
+![](docs/waving.png)
+
 This is a rework of [eyalcha/thermal](https://github.com/eyalcha/thermal) that corrects a number of issues, makes it compatible with HA 2016.6 forward, and adds new functionality.
 
 ## Differences
@@ -13,7 +19,11 @@ This is may not be a complete list:
 
 - The platform/domain name is `thermal_vision` instead of `thermal`
 - More resilient connections
-- Fixes https://github.com/eyalcha/thermal/issues/1 https://github.com/eyalcha/thermal/issues/2 https://github.com/eyalcha/thermal/issues/5 https://github.com/eyalcha/thermal/issues/6
+- Fixes issues:
+  - https://github.com/eyalcha/thermal/issues/1
+  - https://github.com/eyalcha/thermal/issues/2
+  - https://github.com/eyalcha/thermal/issues/5
+  - https://github.com/eyalcha/thermal/issues/6
 - Works with HA 2016.6 and up
 - Optional auto-ranging capabilities
 - Optional in-camera overlay of metrics
