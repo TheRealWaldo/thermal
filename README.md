@@ -7,6 +7,14 @@
 
 This is a rework of [eyalcha/thermal](https://github.com/eyalcha/thermal) that corrects a number of issues, makes it compatible with HA 2016.6 forward, and adds new functionality.
 
+## Differences
+
+This is not a complete list:
+
+- More resilient connections
+- Optional auto-ranging capabilities
+- Optional in-camera overlay of metrics
+
 ## Installation
 
 ### INSTALLATION VIA HACS
