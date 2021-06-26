@@ -1,4 +1,4 @@
-"""Thermal integration"""
+"""Thermal Vision Integration"""
 
 import logging
 import voluptuous as vol

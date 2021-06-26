@@ -1,4 +1,4 @@
-"""Thermal Grid Camera"""
+"""Thermal Vision Camera"""
 
 import logging
 import asyncio
@@ -28,7 +28,7 @@ from homeassistant.const import (
 from .utils import constrain, map_value
 from .interpolate import interpolate
 from urllib.parse import urljoin
-from .client import Client
+from .client import ThermalVisionClient
 
 from .const import (
     CONF_OVERLAY,
@@ -111,10 +111,10 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
 async def async_setup_platform(hass, config, async_add_entities, discovery_info=None):
     """Set up camera component."""
     _LOGGER.debug("async setup Thermal camera")
-    async_add_entities([ThermalCamera(config)])
+    async_add_entities([ThermalVisionCamera(config)])
 
 
-class ThermalCamera(Camera):
+class ThermalVisionCamera(Camera):
     """A camera component producing thermal image from grid sensor data"""
 
     def __init__(self, config):
@@ -165,7 +165,7 @@ class ThermalCamera(Camera):
             (int(c.red * 255), int(c.green * 255), int(c.blue * 255))
             for c in self._colors
         ]
-        self._client = Client(self._host, self._verify_ssl)
+        self._client = ThermalVisionClient(self._host, self._verify_ssl)
         self._setup_default_image()
 
     @property

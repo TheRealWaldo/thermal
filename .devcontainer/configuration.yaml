@@ -3,7 +3,7 @@ default_config:
 logger:
   default: info
   logs:
-    custom_components.thermal: debug
+    custom_components.thermal_vision: debug
 
 # If you need to debug uncommment the line below (doc: https://www.home-assistant.io/integrations/debugpy/)
 # debugpy:
@@ -17,13 +17,13 @@ homeassistant:
     - type: homeassistant
 
 sensor:
-  - platform: thermal
-    name: Prototype Thermal Sensor
+  - platform: thermal_vision
+    name: Thermal Vision Sensor
     host: http://192.168.3.91
 
 camera:
-  - platform: thermal
-    name: Prototype Thermal Camera
+  - platform: thermal_vision
+    name: Thermal Vision Camera
     host: http://192.168.3.91
     scan_interval: 2
     auto_range: true

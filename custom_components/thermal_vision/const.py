@@ -1,6 +1,6 @@
-"""Constants for integration."""
+"""Constants for Thermal Vision integration."""
 
-DOMAIN = "thermal"
+DOMAIN = "thermal_vision"
 
 VERSION = "1.3.0"
 ISSUE_URL = "https://github.com/TheRealWaldo/thermal/issues"
@@ -29,7 +29,7 @@ CONF_HOT_COLOR = "hot_color"
 CONF_SESSION_TIMEOUT = "session_timeout"
 CONF_OVERLAY = "overlay"
 
-DEFAULT_NAME = "Thermal"
+DEFAULT_NAME = "Thermal Vision"
 DEFAULT_VERIFY_SSL = False
 DEFAULT_OVERLAY = False
 DEFAULT_IMAGE_WIDTH = 640

@@ -1,5 +1,5 @@
 {
-  "domain": "thermal",
+  "domain": "thermal_vision",
   "name": "Thermal Vision",
   "issue_tracker": "https://github.com/TheRealWaldo/thermal/issues",
   "documentation": "https://github.com/TheRealWaldo/thermal/blob/main/README.md",
