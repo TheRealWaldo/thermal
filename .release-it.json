@@ -19,7 +19,7 @@
   "npm": false,
   "plugins": {
     "@release-it/bumper": {
-      "out": [ "README.md", "custom_components/thermal/manifest.json", "custom_components/thermal/const.py" ]
+      "out": [ "README.md", "custom_components/thermal_vision/manifest.json", "custom_components/thermal_vision/const.py" ]
     },
     "@release-it/conventional-changelog": {
       "preset": {

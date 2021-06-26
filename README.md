@@ -1,4 +1,4 @@
-# Thermal
+# Thermal Vision
 
 [![hacs][hacsbadge]][hacs]
 [![GitHub Release][releases-shield]][releases]
@@ -11,6 +11,7 @@ This is a rework of [eyalcha/thermal](https://github.com/eyalcha/thermal) that c
 
 This is not a complete list:
 
+- The platform/domain name is `thermal_vision` instead of `thermal`
 - More resilient connections
 - Optional auto-ranging capabilities
 - Optional in-camera overlay of metrics
@@ -25,10 +26,10 @@ Follow the instructions at https://hacs.xyz/docs/faq/custom_repositories/ using 
 
 1. Download the zip file from
    [latest release](https://github.com/TheRealWaldo/thermal/releases/latest).
-2. Unpack the release and copy the `custom_components/thermal` directory
+2. Unpack the release and copy the `custom_components/thermal_vision` directory
    into the `custom_components` directory of your Home Assistant
    installation.
-3. Configure the `thermal` sensor and/or camera.
+3. Configure the `thermal_vision` sensor and/or camera.
 4. Restart Home Assistant.
 
 ## Configuration
@@ -39,7 +40,7 @@ Follow the instructions at https://hacs.xyz/docs/faq/custom_repositories/ using 
 # Example configuration.yaml entry
 
 camera:
-  - platform: thermal
+  - platform: thermal_vision
     host: http://192.168.0.10
 ```
 
@@ -47,8 +48,8 @@ camera:
 
 |Parameter |Required|Description
 |:---|---|---
-| `platform` | Yes | Platform name
-| `name` | No | Friendly name **Default**: `Thermal`
+| `platform` | Yes | Platform name `thermal_vision`
+| `name` | No | Friendly name **Default**: `Thermal Vision`
 | `host` | Yes | IP address or hostname of your Thermal sensor server
 | `verify_ssl` | No | Verify SSL or not **Default**: `false`
 | `width` | No | Image width in pixels **Default**: `640`
@@ -97,7 +98,7 @@ Sensor
 # Example configuration.yaml entry
 
 sensor:
-  - platform: thermal
+  - platform: thermal_vision
     host: http://192.168.0.10
 ```
 
@@ -105,8 +106,8 @@ sensor:
 
 |Parameter |Required|Description
 |:---|---|---
-| `platform` | Yes | Platform name
-| `name` | No | Friendly name **Default**: `Thermal`
+| `platform` | Yes | Platform name `thermal_vision`
+| `name` | No | Friendly name **Default**: `Thermal Vision`
 | `host` | Yes | IP address of your Thermal sensor server
 | `verify_ssl` | No | Verify SSL or not **Default**: `false`
 | `scan_interval` | No | Get raw data interval in seconds **Default**: `60`

@@ -1,4 +1,4 @@
-"""Thermal grid sensor"""
+"""Thermal Vision Sensor"""
 
 import logging
 
@@ -41,7 +41,7 @@ from .const import (
     DEFAULT_VERIFY_SSL,
 )
 
-from .client import Client
+from .client import ThermalVisionClient
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -74,21 +74,21 @@ PLATFORM_SCHEMA = vol.All(
 
 async def async_setup_platform(hass, config, async_add_entities, discovery_info=None):
     """Set up the sensor platform."""
-    _LOGGER.debug("async setup Thermal sensor")
-    async_add_entities([ThermalSensor(hass, config)])
+    _LOGGER.debug("async setup Thermal Vision Sensor")
+    async_add_entities([ThermalVisionSensor(hass, config)])
 
 
-class ThermalSensor(Entity):
-    """Thermal sensor"""
+class ThermalVisionSensor(Entity):
+    """Thermal Vision Sensor"""
 
     def __init__(self, hass, config) -> None:
-        """Initialize thermal sensor"""
+        """Initialize Thermal Vision Sensor"""
         self._hass = hass
         self._name = config.get(CONF_NAME)
-        _LOGGER.debug(f"Initialize Thermal sensor {self._name}")
+        _LOGGER.debug(f"Initialize Thermal Vision Sensor {self._name}")
 
         self._verify_ssl = config.get(CONF_VERIFY_SSL)
-        self._client = Client(config.get(CONF_HOST), self._verify_ssl)
+        self._client = ThermalVisionClient(config.get(CONF_HOST), self._verify_ssl)
 
         self._state = None
         self._icon = "mdi:grid"

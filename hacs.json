@@ -1,5 +1,5 @@
 {
-  "name": "Thermal",
+  "name": "Thermal Vision",
   "country": "CA",
   "domains": ["camera", "sensor"],
   "render_readme": true,

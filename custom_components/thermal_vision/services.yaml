@@ -3,4 +3,4 @@ auto_scale:
   fields:
     entity_id:
       description: Camera or sensor entity id
-      example: camera.thermal
+      example: camera.thermal_vision
