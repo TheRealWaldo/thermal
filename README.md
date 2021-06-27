@@ -31,7 +31,13 @@ This is may not be a complete list:
 
 ## Installation
 
-### INSTALLATION VIA HACS
+There is three options to install this integration; HACS is the easiest.
+
+## INSTALLATION VIA HACS
+
+This integration is installable via [HACS](https://hacs.xyz/).  Just go in to the HACS Integrations section and search for the "Thermal Vision" repository then click Install!
+
+### MANUAL INSTALLATION VIA HACS
 
 Follow the instructions at https://hacs.xyz/docs/faq/custom_repositories/ using the URL https://github.com/TheRealWaldo/thermal
 
