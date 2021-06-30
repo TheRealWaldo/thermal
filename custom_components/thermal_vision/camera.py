@@ -14,6 +14,7 @@ import voluptuous as vol
 from colour import Color
 from PIL import Image, ImageDraw
 
+from homeassistant import util
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
 from homeassistant.components.camera import PLATFORM_SCHEMA, Camera
@@ -23,6 +24,7 @@ from homeassistant.const import (
     CONF_HOST,
     CONF_NAME,
     CONF_VERIFY_SSL,
+    TEMP_CELSIUS,
 )
 
 from .utils import constrain, map_value
@@ -111,13 +113,13 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
 async def async_setup_platform(hass, config, async_add_entities, discovery_info=None):
     """Set up camera component."""
     _LOGGER.debug("async setup Thermal camera")
-    async_add_entities([ThermalVisionCamera(config)])
+    async_add_entities([ThermalVisionCamera(config, hass)])
 
 
 class ThermalVisionCamera(Camera):
     """A camera component producing thermal image from grid sensor data"""
 
-    def __init__(self, config):
+    def __init__(self, config, hass):
         """Initialize the component."""
         super().__init__()
         self._name = config.get(CONF_NAME)
@@ -138,6 +140,8 @@ class ThermalVisionCamera(Camera):
         self._session_timeout = config.get(CONF_SESSION_TIMEOUT)
         self._overlay = config.get(CONF_OVERLAY)
         self._fps = None
+        self._temperature_unit = hass.config.units.temperature_unit
+        _LOGGER.debug("Temperature unit %s", self._temperature_unit)
 
         sensor = config.get(
             CONF_SENSOR, {CONF_ROWS: DEFAULT_ROWS, CONF_COLS: DEFAULT_COLS}
@@ -183,10 +187,18 @@ class ThermalVisionCamera(Camera):
         """Return the camera state attributes."""
         return {
             "fps": self._fps,
-            "min": self._pixel_min_temp,
-            "max": self._pixel_max_temp,
-            "range_min": self._min_temperature,
-            "range_max": self._max_temperature,
+            "min": self._pixel_min_temp
+            if self._temperature_unit == TEMP_CELSIUS
+            else util.temperature.celsius_to_fahrenheit(self._pixel_min_temp),
+            "max": self._pixel_max_temp
+            if self._temperature_unit == TEMP_CELSIUS
+            else util.temperature.celsius_to_fahrenheit(self._pixel_max_temp),
+            "range_min": self._min_temperature
+            if self._temperature_unit == TEMP_CELSIUS
+            else util.temperature.celsius_to_fahrenheit(self._min_temperature),
+            "range_max": self._max_temperature
+            if self._temperature_unit == TEMP_CELSIUS
+            else util.temperature.celsius_to_fahrenheit(self._max_temperature),
         }
 
     async def async_camera_image(self):
@@ -289,9 +301,30 @@ class ThermalVisionCamera(Camera):
 
         # Add overlay
         if self._overlay:
+            min_temp = (
+                self._pixel_min_temp
+                if self._temperature_unit == TEMP_CELSIUS
+                else util.temperature.celsius_to_fahrenheit(self._pixel_min_temp)
+            )
+            max_temp = (
+                self._pixel_max_temp
+                if self._temperature_unit == TEMP_CELSIUS
+                else util.temperature.celsius_to_fahrenheit(self._pixel_max_temp)
+            )
+            min_temperature = (
+                self._min_temperature
+                if self._temperature_unit == TEMP_CELSIUS
+                else util.temperature.celsius_to_fahrenheit(self._min_temperature)
+            )
+            max_temperature = (
+                self._max_temperature
+                if self._temperature_unit == TEMP_CELSIUS
+                else util.temperature.celsius_to_fahrenheit(self._max_temperature)
+            )
+
             draw.multiline_text(
                 (10, 10),
-                f"Min: {self._pixel_min_temp}\nMax: {self._pixel_max_temp}\nRange: {self._min_temperature} - {self._max_temperature}",
+                f"Min: {min_temp}{self._temperature_unit}\nMax: {max_temp}{self._temperature_unit}\nRange: {min_temperature}{self._temperature_unit} - {max_temperature}{self._temperature_unit}",
                 fill=(255, 255, 0),
             )
 

@@ -9,7 +9,7 @@ logger:
 # debugpy:
 
 homeassistant:
-  unit_system: metric
+  unit_system: imperial
   temperature_unit: C
   time_zone: America/Edmonton
   elevation: 1045
