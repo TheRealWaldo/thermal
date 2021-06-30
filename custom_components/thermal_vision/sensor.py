@@ -12,6 +12,7 @@ from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers.config_validation import PLATFORM_SCHEMA
 from homeassistant.helpers.entity import Entity
 
+from homeassistant import util
 from homeassistant.util import Throttle
 
 from homeassistant.const import (
@@ -19,11 +20,17 @@ from homeassistant.const import (
     CONF_HOST,
     CONF_SCAN_INTERVAL,
     DEVICE_CLASS_TEMPERATURE,
-    TEMP_CELSIUS,
     CONF_VERIFY_SSL,
+    TEMP_FAHRENHEIT,
 )
 
 from .const import (
+    ATTR_AVG,
+    ATTR_MAX,
+    ATTR_MAX_INDEX,
+    ATTR_MIN,
+    ATTR_MIN_INDEX,
+    ATTR_SENSOR_TEMP,
     CONF_STATE,
     CONF_ROI,
     CONF_LEFT,
@@ -99,9 +106,17 @@ class ThermalVisionSensor(Entity):
         self._verify_ssl = config.get(CONF_VERIFY_SSL)
         self._client = ThermalVisionClient(config.get(CONF_HOST), self._verify_ssl)
 
+        self._temperature_unit = hass.config.units.temperature_unit
+
         self._state = None
         self._icon = "mdi:grid"
-        self._attributes = {}
+
+        self._average_temp = None
+        self._min_temp = None
+        self._max_temp = None
+        self._min_index = None
+        self._max_index = None
+        self._sensor_temp = None
 
         self._state_type = config.get(CONF_STATE)
 
@@ -151,7 +166,8 @@ class ThermalVisionSensor(Entity):
     @property
     def unit_of_measurement(self):
         """Return the unit of measurement."""
-        return TEMP_CELSIUS
+
+        return self._temperature_unit
 
     @property
     def device_class(self):
@@ -161,45 +177,64 @@ class ThermalVisionSensor(Entity):
     @property
     def device_state_attributes(self):
         """Return the attributes of the sensor."""
-        return self._attributes
+        return {
+            ATTR_AVG: self._average_temp,
+            ATTR_MIN: self._min_temp,
+            ATTR_MAX: self._max_temp,
+            ATTR_MIN_INDEX: self._min_index,
+            ATTR_MAX_INDEX: self._max_index,
+            ATTR_SENSOR_TEMP: self._sensor_temp,
+        }
 
     @property
     def icon(self):
         """Return the icon of the sensor."""
         return self._icon
 
+    def _set_state(self):
+        """Set state based on sensor type"""
+        if self._state_type == ATTR_MAX:
+            self._state = self._max_temp
+        elif self._state_type == ATTR_MIN:
+            self._state = self._min_temp
+        elif self._state_type == ATTR_AVG:
+            self._state = self._average_temp
+
+        if self._state is None:
+            self._available = False
+        else:
+            self._available = True
+
     def _update(self) -> None:
         try:
             self._client.call()
             pixels = self._client.get_raw()
-
+            self._sensor_temp = self._client.get_temp()
             pixels = np.reshape(pixels, (self._rows, self._cols))
 
             pixels = pixels[
-                self._roi["top"] : self._roi["bottom"] + 1,
-                self._roi["left"] : self._roi["right"] + 1,
+                self._roi[CONF_TOP] : self._roi[CONF_BOTTOM] + 1,
+                self._roi[CONF_LEFT] : self._roi[CONF_RIGHT] + 1,
             ]
 
-            average_temp = np.average(pixels)
-            min_temp = np.amin(pixels)
-            max_temp = np.amax(pixels)
+            self._average_temp = np.average(pixels)
+            self._min_temp = np.amin(pixels)
+            self._max_temp = np.amax(pixels)
 
-            min_index = np.argmin(pixels).item()
-            max_index = np.argmax(pixels).item()
+            self._min_index = np.argmin(pixels).item()
+            self._max_index = np.argmax(pixels).item()
 
-            self._attributes = {
-                "average": average_temp,
-                "min": min_temp,
-                "max": max_temp,
-                "min_index": min_index,
-                "max_index": max_index,
-                "sensor_temp": self._client.get_temp(),
-            }
-            if self._state_type == "max":
-                self._state = max_temp
-            elif self._state_type == "min":
-                self._state = min_temp
-            else:
-                self._state = average_temp
+            if self._temperature_unit == TEMP_FAHRENHEIT:
+                self._average_temp = util.temperature.celsius_to_fahrenheit(
+                    self._average_temp
+                )
+                self._min_temp = util.temperature.celsius_to_fahrenheit(self._min_temp)
+                self._max_temp = util.temperature.celsius_to_fahrenheit(self._max_temp)
+                self._sensor_temp = util.temperature.celsius_to_fahrenheit(
+                    self._sensor_temp
+                )
+
+            self._set_state()
+
         except Exception:
             self._state = None
