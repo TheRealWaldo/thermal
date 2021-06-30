@@ -35,7 +35,7 @@ There is three options to install this integration; HACS is the easiest.
 
 ## INSTALLATION VIA HACS
 
-This integration is installable via [HACS](https://hacs.xyz/).  Just go in to the HACS Integrations section and search for the "Thermal Vision" repository then click Install!
+This integration will soon be installable via [HACS](https://hacs.xyz/) as a default repository, pending https://github.com/hacs/default/pull/1005.  Once that's completed, just go in to the HACS Integrations section and search for the "Thermal Vision" repository then click Install!
 
 ### MANUAL INSTALLATION VIA HACS
 
