@@ -2,7 +2,7 @@
 
 DOMAIN = "thermal_vision"
 
-VERSION = "2.1.0"
+VERSION = "2.1.1"
 ISSUE_URL = "https://github.com/TheRealWaldo/thermal/issues"
 
 CONF_WIDTH = "width"
