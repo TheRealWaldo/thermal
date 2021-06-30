@@ -52,7 +52,16 @@ PLATFORM_SCHEMA = vol.All(
             vol.Optional(CONF_NAME, default=DEFAULT_NAME): cv.string,
             vol.Optional(CONF_VERIFY_SSL, default=DEFAULT_VERIFY_SSL): cv.boolean,
             vol.Optional(CONF_SCAN_INTERVAL): cv.time_period,
-            vol.Optional(CONF_STATE, default=DEFAULT_STATE): cv.string,
+            vol.Optional(CONF_STATE, default=DEFAULT_STATE): vol.All(
+                cv.string,
+                vol.In(
+                    (
+                        ATTR_MIN,
+                        ATTR_MAX,
+                        ATTR_AVG,
+                    )
+                ),
+            ),
             vol.Optional(CONF_ROI): vol.Schema(
                 {
                     vol.Required(CONF_LEFT): cv.positive_int,
