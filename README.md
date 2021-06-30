@@ -25,6 +25,7 @@ This is may not be a complete list:
   - https://github.com/eyalcha/thermal/issues/5
   - https://github.com/eyalcha/thermal/issues/6
 - Works with HA 2016.6 and up
+- Allows for both imperial and metric measurements
 - Optional auto-ranging capabilities
 - Optional in-camera overlay of metrics
 
