@@ -27,7 +27,7 @@ jobs:
 
       - name: Bump version
         id: bump-version
-        uses: TheRealWaldo/release-it@v0.3.1
+        uses: TheRealWaldo/release-it@v0.5.0
         with:
           github-token: ${{ secrets.AUTO_PAT }}
           github-username: TRW-bot
