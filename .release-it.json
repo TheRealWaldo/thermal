@@ -5,7 +5,7 @@
     "tagName": "${version}",
     "tagAnnotation": "Release ${version}",
     "commit": true,
-    "commitMessage": "chore(release): ${version}",
+    "commitMessage": "chore(release): ${version}\n${changelog}",
     "push": true
   },
   "github": {
