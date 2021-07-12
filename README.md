@@ -9,6 +9,8 @@ The Thermal Vision integration allows for the use of the [AMG8833 sensor](https:
 
 This can be used to detect humans much more reliably than motion sensors as it does not require the subject to be moving.  It also produces a pretty thermal camera!
 
+Firmware for a simple sensor using an ESP8266 (I'm using a D1 Mini) can built using [TheRealWaldo/esp8266-amg8833](https://github.com/TheRealWaldo/esp8266-amg8833).  This firmware is still under development!
+
 ![](docs/waving.png)
 
 This is a rework of [eyalcha/thermal](https://github.com/eyalcha/thermal) that corrects a number of issues, makes it compatible with HA 2016.6 forward, and adds new functionality.
