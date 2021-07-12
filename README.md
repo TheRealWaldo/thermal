@@ -134,7 +134,7 @@ sensor:
 | `scan_interval` | No | Get raw data interval in seconds **Default**: `60`
 | `sensor` | No | Sensor related configurations (see below)
 | `roi` | No | Sensor region of interest (see below)
-| `state` | No | Sensor state type (`average`, `max`, `min`) **Default**: `average`
+| `state` | No | Sensor state type (`average`, `max`, `min`, `sensor_temp`) **Default**: `average`
 
 Sensor
 
