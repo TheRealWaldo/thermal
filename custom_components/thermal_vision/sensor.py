@@ -230,11 +230,13 @@ class ThermalVisionSensor(Entity):
                 )
                 self._min_temp = util.temperature.celsius_to_fahrenheit(self._min_temp)
                 self._max_temp = util.temperature.celsius_to_fahrenheit(self._max_temp)
-                self._sensor_temp = util.temperature.celsius_to_fahrenheit(
-                    self._sensor_temp
-                )
+                if not self._sensor_temp is None:
+                    self._sensor_temp = util.temperature.celsius_to_fahrenheit(
+                        self._sensor_temp
+                    )
 
             self._set_state()
 
-        except Exception:
+        except Exception as err:
+            _LOGGER.warning("Updating the sensor failed: %s", err)
             self._state = None
