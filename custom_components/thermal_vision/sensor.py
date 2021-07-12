@@ -66,6 +66,7 @@ PLATFORM_SCHEMA = vol.All(
                         ATTR_MIN,
                         ATTR_MAX,
                         ATTR_AVG,
+                        ATTR_SENSOR_TEMP,
                     )
                 ),
             ),
