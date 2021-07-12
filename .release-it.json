@@ -11,7 +11,7 @@
   "github": {
     "release": true,
     "releaseName": "Release ${version}",
-    "draft": true
+    "draft": false
   },
   "hooks": {
     "after:release": "echo Successfully bumped release to ${version} for ${repo.repository}."
@@ -19,7 +19,7 @@
   "npm": false,
   "plugins": {
     "@release-it/bumper": {
-      "out": [ "README.md", "custom_components/thermal_vision/manifest.json", "custom_components/thermal_vision/const.py" ]
+      "out": [ "README.md", "custom_components/thermal_vision/manifest.json", "custom_components/thermal_vision/const.py", "VERSION" ]
     },
     "@release-it/conventional-changelog": {
       "preset": {
