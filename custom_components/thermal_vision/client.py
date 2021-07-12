@@ -24,8 +24,10 @@ class ThermalVisionClient(object):
         response.raise_for_status()
         decoded = response.json()
 
-        if decoded["temp"]:
+        if "temp" in decoded:
             self._temp = decoded["temp"]
+        else:
+            self._temp = None
 
         self._pixels = list(map(lambda x: float(x), decoded["data"].split(",")))
 
