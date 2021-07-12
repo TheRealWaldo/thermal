@@ -39,6 +39,7 @@ jobs:
           json-opts: '{"github": {"release": false}}'
 
       - name: Create pull request
+        if: "github.ref == 'refs/heads/main' && !contains(toJSON(github.event.commits.*.message), 'chore(release)')"
         uses: TheRealWaldo/pull-request@v0.1.0
         env:
           GITHUB_TOKEN: ${{ secrets.AUTO_PAT }}
