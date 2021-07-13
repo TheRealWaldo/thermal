@@ -200,6 +200,8 @@ class ThermalVisionSensor(Entity):
             self._state = self._min_temp
         elif self._state_type == ATTR_AVG:
             self._state = self._average_temp
+        elif self._state_type == ATTR_SENSOR_TEMP:
+            self.state = self._sensor_temp
 
         if self._state is None:
             self._available = False
