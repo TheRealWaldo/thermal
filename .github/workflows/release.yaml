@@ -53,7 +53,7 @@ jobs:
 
       - name: Release
         if: "github.ref == 'refs/heads/main' && contains(toJSON(github.event.commits.*.message), 'chore(release)')"
-        uses: TheRealWaldo/release-it@v0.5.1
+        uses: TheRealWaldo/release-it@v0.5.2
         with:
           no-increment: true
           github-token: ${{ secrets.AUTO_PAT }}
