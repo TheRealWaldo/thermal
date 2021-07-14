@@ -27,7 +27,7 @@ jobs:
       - name: Bump version
         if: "github.ref == 'refs/heads/main' && !contains(toJSON(github.event.commits.*.message), 'chore(release)')"
         id: bump-version
-        uses: TheRealWaldo/release-it@v0.5.1
+        uses: TheRealWaldo/release-it@v0.5.2
         with:
           github-token: ${{ secrets.AUTO_PAT }}
           github-username: TRW-bot
