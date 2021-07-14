@@ -13,7 +13,7 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: HACS validation
-        uses: hacs/action@main
+        uses: TheRealWaldo/faster-hacs-action@updates
         with:
           category: integration
 
