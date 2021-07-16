@@ -18,7 +18,7 @@
   "homepage": "https://github.com/TheRealWaldo/thermal#readme",
   "devDependencies": {
     "@commitlint/config-conventional": "^12.1.4",
-    "@release-it/bumper": "^3.0.0",
+    "@release-it/bumper": "^3.0.1",
     "@release-it/conventional-changelog": "^3.0.1",
     "release-it": "^14.10.0"
   }
