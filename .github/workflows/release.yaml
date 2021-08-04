@@ -11,7 +11,7 @@ jobs:
     name: Release action
     steps:
       - name: Setup node.js
-        uses: actions/setup-node@v2.3.0
+        uses: actions/setup-node@v2.3.2
         with:
           node-version: 14
 
