@@ -27,7 +27,7 @@ jobs:
       - name: Bump version
         if: "github.ref == 'refs/heads/main' && !contains(toJSON(github.event.commits.*.message), 'chore(release)')"
         id: bump-version
-        uses: TheRealWaldo/release-it@v0.6.0
+        uses: TheRealWaldo/release-it@v0.7.0
         with:
           github-token: ${{ secrets.AUTO_PAT }}
           github-username: TRW-bot
@@ -53,7 +53,7 @@ jobs:
 
       - name: Release
         if: "github.ref == 'refs/heads/main' && contains(toJSON(github.event.commits.*.message), 'chore(release)')"
-        uses: TheRealWaldo/release-it@v0.6.0
+        uses: TheRealWaldo/release-it@v0.7.0
         with:
           no-increment: true
           github-token: ${{ secrets.AUTO_PAT }}
