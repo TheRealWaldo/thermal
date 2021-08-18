@@ -11,7 +11,9 @@ This can be used to detect humans much more reliably than motion sensors as it d
 
 Firmware for a simple sensor using an ESP8266 (I'm using a D1 Mini) can built using [TheRealWaldo/esp8266-amg8833](https://github.com/TheRealWaldo/esp8266-amg8833).  This firmware is still under development!
 
-![](docs/waving.png)
+Also, there's an experimental implementation using [ESPHome](https://esphome.io/) at [TheRealWaldo/AMG8833-ESPHOME](https://github.com/TheRealWaldo/AMG8833-ESPHOME).  You can leverage this by setting `pixel_sensor` to the sensor created by ESPHome and not using `host`.  Note: this only works with the camera at this time.
+
+![Me, waving](docs/waving.png)
 
 This is a rework of [eyalcha/thermal](https://github.com/eyalcha/thermal) that corrects a number of issues, makes it compatible with HA 2016.6 forward, and adds new functionality.
 
@@ -72,6 +74,7 @@ camera:
 | `platform` | Yes | Platform name `thermal_vision`
 | `name` | No | Friendly name **Default**: `Thermal Vision`
 | `host` | Yes | IP address or hostname of your Thermal sensor server
+| `pixel_sensor` | Required if `host` is not set; sensor containing the base64 encoded pixels
 | `verify_ssl` | No | Verify SSL or not **Default**: `false`
 | `width` | No | Image width in pixels **Default**: `640`
 | `height` | No | Image height in pixels **Default**: `640`

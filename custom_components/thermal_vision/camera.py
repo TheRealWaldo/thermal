@@ -7,6 +7,7 @@ import async_timeout
 
 import io
 import time
+import base64
 
 import numpy as np
 import voluptuous as vol
@@ -25,6 +26,7 @@ from homeassistant.const import (
     CONF_NAME,
     CONF_VERIFY_SSL,
     TEMP_CELSIUS,
+    STATE_UNKNOWN,
 )
 
 from .utils import constrain, map_value
@@ -52,6 +54,7 @@ from .const import (
     CONF_INTERPOLATE,
     CONF_ROWS,
     CONF_COLS,
+    CONF_PIXEL_SENSOR,
     DEFAULT_NAME,
     DEFAULT_VERIFY_SSL,
     DEFAULT_IMAGE_WIDTH,
@@ -72,7 +75,8 @@ _LOGGER = logging.getLogger(__name__)
 
 PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
     {
-        vol.Required(CONF_HOST): cv.url,
+        vol.Exclusive(CONF_HOST, 1): cv.url,
+        vol.Exclusive(CONF_PIXEL_SENSOR, 1): cv.entity_id,
         vol.Optional(CONF_NAME, default=DEFAULT_NAME): cv.string,
         vol.Optional(CONF_VERIFY_SSL, default=DEFAULT_VERIFY_SSL): cv.boolean,
         vol.Optional(CONF_WIDTH, default=DEFAULT_IMAGE_WIDTH): cv.positive_int,
@@ -106,7 +110,10 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
             CONF_SESSION_TIMEOUT, default=DEFAULT_SESSION_TIMEOUT
         ): cv.positive_int,
         vol.Optional(CONF_OVERLAY, default=DEFAULT_OVERLAY): cv.boolean,
-    }
+    },
+    {
+        vol.Required(vol.Any(CONF_HOST, CONF_PIXEL_SENSOR)),
+    },
 )
 
 
@@ -126,6 +133,7 @@ class ThermalVisionCamera(Camera):
         _LOGGER.debug(f"Initialize Thermal camera {self._name}")
 
         self._host = config.get(CONF_HOST)
+        self._pixel_sensor = config.get(CONF_PIXEL_SENSOR)
 
         self._image_width = config.get(CONF_WIDTH)
         self._image_height = config.get(CONF_HEIGHT)
@@ -169,7 +177,9 @@ class ThermalVisionCamera(Camera):
             (int(c.red * 255), int(c.green * 255), int(c.blue * 255))
             for c in self._colors
         ]
-        self._client = ThermalVisionClient(self._host, self._verify_ssl)
+        if self._host:
+            self._client = ThermalVisionClient(self._host, self._verify_ssl)
+
         self._setup_default_image()
 
     @property
@@ -203,37 +213,64 @@ class ThermalVisionCamera(Camera):
 
     async def async_camera_image(self):
         """Pull image from camera"""
-        start = int(round(time.time() * 1000))
-        websession = async_get_clientsession(self.hass, verify_ssl=self._verify_ssl)
-        try:
-            with async_timeout.timeout(self._session_timeout):
-                response = await websession.get(urljoin(self._host, "raw"))
-                jsonResponse = await response.json()
-                if jsonResponse:
-                    data = jsonResponse["data"].split(",")
-                    self._setup_range(data)
-                    self._default_image = self._camera_image(data)
+        if self._host:
+            start = int(round(time.time() * 1000))
+            websession = async_get_clientsession(self.hass, verify_ssl=self._verify_ssl)
+            try:
+                with async_timeout.timeout(self._session_timeout):
+                    response = await websession.get(urljoin(self._host, "raw"))
+                    jsonResponse = await response.json()
+                    if jsonResponse:
+                        data = jsonResponse["data"].split(",")
+                        self._setup_range(data)
+                        self._default_image = self._camera_image(data)
 
-        except asyncio.TimeoutError:
-            _LOGGER.warning("Timeout getting camera image from %s", self._name)
-            return self._default_image
+            except asyncio.TimeoutError:
+                _LOGGER.warning("Timeout getting camera image from %s", self._name)
+                return self._default_image
 
-        except aiohttp.ClientError as err:
-            _LOGGER.error("Error getting new camera image from %s: %s", self._name, err)
-            return self._default_image
+            except aiohttp.ClientError as err:
+                _LOGGER.error(
+                    "Error getting new camera image from %s: %s", self._name, err
+                )
+                return self._default_image
 
-        except Exception as err:
-            _LOGGER.error("Failed to generate camera (%s)", err)
-            return self._default_image
+            except Exception as err:
+                _LOGGER.error("Failed to generate camera (%s)", err)
+                return self._default_image
 
-        self._fps = int(1000.0 / (int(round(time.time() * 1000)) - start))
+            self._fps = int(1000.0 / (int(round(time.time() * 1000)) - start))
+        else:
+            self._update_pixel_sensor()
+
         return self._default_image
 
     def camera_image(self):
-        self._client.call()
-        return self._camera_image(self._client.get_raw())
+        """Get image for camera"""
+        if self._host:
+            self._client.call()
+            return self._camera_image(self._client.get_raw())
+        else:
+            self._update_pixel_sensor()
+            return self._default_image
+
+    def _update_pixel_sensor(self):
+        """Decode pixels from sensor and update camera image"""
+
+        encoded_pixels = self.hass.states.get(self._pixel_sensor).state
+        _LOGGER.debug("Decoding pixels: %s", encoded_pixels)
+        if encoded_pixels != STATE_UNKNOWN:
+            data = []
+            for char in base64.b64decode(encoded_pixels):
+                if char & (1 << 11):
+                    char &= ~(1 << 11)
+                    char = char * -1
+                data.append(char * 0.25)
+            self._setup_range(data)
+            self._default_image = self._camera_image(data)
 
     def _setup_range(self, pixels):
+        """Perform auto-ranging"""
         self._pixel_min_temp = float(min(pixels))
         self._pixel_max_temp = float(max(pixels))
         if self._auto_range:
@@ -251,6 +288,7 @@ class ThermalVisionCamera(Camera):
                 self._max_temperature = self._pixel_max_temp
 
     def _setup_default_image(self):
+        """Set up a default image"""
         self._default_image = self._camera_image(
             np.full(self._rows * self._cols, self._min_temperature)
         )

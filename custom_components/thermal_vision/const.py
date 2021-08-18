@@ -7,6 +7,7 @@ ISSUE_URL = "https://github.com/TheRealWaldo/thermal/issues"
 
 CONF_WIDTH = "width"
 CONF_HEIGHT = "height"
+CONF_PIXEL_SENSOR = "pixel_sensor"
 CONF_MIN_TEMPERATURE = "min_temp"
 CONF_MAX_TEMPERATURE = "max_temp"
 CONF_METHOD = "method"
