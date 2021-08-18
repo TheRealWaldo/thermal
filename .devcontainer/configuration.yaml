@@ -21,6 +21,11 @@ sensor:
     name: Thermal Vision Sensor
     host: http://192.168.3.91
 
+input_text:
+  psuedo_pixels:
+    name: Pseudo Pixels
+    initial: Zl1cXVxdXFtlYF5aXltYWmhgXV5dXFxabGJeXV5eXFprZF1eXF1cXG9lXV5cXFpaamZdXFtbW1tgX15bXVxdXA==
+
 camera:
   - platform: thermal_vision
     name: Thermal Vision Camera
@@ -28,4 +33,10 @@ camera:
     scan_interval: 2
     auto_range: true
     mirror: true
+    overlay: true
+
+  - platform: thermal_vision
+    name: Thermal Vision Camera from ESPHome Sensor
+    pixel_sensor: input_text.psuedo_pixels
+    auto_range: true
     overlay: true
