@@ -27,6 +27,7 @@ from homeassistant.const import (
     CONF_VERIFY_SSL,
     TEMP_CELSIUS,
     STATE_UNKNOWN,
+    STATE_UNAVAILABLE,
 )
 
 from .utils import constrain, map_value
@@ -259,7 +260,7 @@ class ThermalVisionCamera(Camera):
 
         encoded_pixels = self.hass.states.get(self._pixel_sensor).state
         _LOGGER.debug("Decoding pixels: %s", encoded_pixels)
-        if encoded_pixels != STATE_UNKNOWN:
+        if encoded_pixels not in [STATE_UNKNOWN, STATE_UNAVAILABLE]:
             data = []
             for char in base64.b64decode(encoded_pixels):
                 if char & (1 << 11):
