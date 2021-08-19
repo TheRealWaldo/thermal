@@ -31,6 +31,7 @@ from .const import (
     ATTR_MIN,
     ATTR_MIN_INDEX,
     ATTR_SENSOR_TEMP,
+    ATTR_PERSON_DETECTED,
     CONF_STATE,
     CONF_ROI,
     CONF_LEFT,
@@ -67,6 +68,7 @@ PLATFORM_SCHEMA = vol.All(
                         ATTR_MAX,
                         ATTR_AVG,
                         ATTR_SENSOR_TEMP,
+                        ATTR_PERSON_DETECTED,
                     )
                 ),
             ),
@@ -185,6 +187,7 @@ class ThermalVisionSensor(Entity):
             ATTR_MIN_INDEX: self._min_index,
             ATTR_MAX_INDEX: self._max_index,
             ATTR_SENSOR_TEMP: self._sensor_temp,
+            ATTR_PERSON_DETECTED: self._person_detected,
         }
 
     @property
@@ -202,6 +205,8 @@ class ThermalVisionSensor(Entity):
             self._state = self._average_temp
         elif self._state_type == ATTR_SENSOR_TEMP:
             self.state = self._sensor_temp
+        elif self._state_type == ATTR_PERSON_DETECTED:
+            self.state = self._person_detected
 
         if self._state is None:
             self._available = False
@@ -213,6 +218,7 @@ class ThermalVisionSensor(Entity):
             self._client.call()
             pixels = self._client.get_raw()
             self._sensor_temp = self._client.get_temp()
+            self._person_detected = self._client.get_person_detected()
             pixels = np.reshape(pixels, (self._rows, self._cols))
 
             pixels = pixels[

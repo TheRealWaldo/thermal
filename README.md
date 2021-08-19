@@ -137,7 +137,7 @@ sensor:
 | `scan_interval` | No | Get raw data interval in seconds **Default**: `60`
 | `sensor` | No | Sensor related configurations (see below)
 | `roi` | No | Sensor region of interest (see below)
-| `state` | No | Sensor state type (`average`, `max`, `min`, `sensor_temp`) **Default**: `average`
+| `state` | No | Sensor state type (`average`, `max`, `min`, `sensor_temp`, `person_detected`) **Default**: `average`
 
 Sensor
 
@@ -159,7 +159,7 @@ ROI
 
 ##### State
 
-The sensor state can be either `average`, `max`, or `min` based on `state` in the configuration.  It defaults to `average`.
+The sensor state can be either `average`, `max`, `min`, or `person_detected` based on `state` in the configuration.  It defaults to `average`.
 
 ##### Attributes
 
@@ -173,6 +173,7 @@ All values are affected by the ROI configuration.
 | `min_index` | The index where the min temperature was detected (1 Dimensional)
 | `max_index` | The index where the max temperature was detected (1 Dimensional)
 | `sensor_temp` | The temperature of the sensor itself (if the sensor provides it)
+| `person_detected` | A boolean representing whether the sensor detected a person or not.  Must use latest firmware!
 
 [commits]: https://github.com/TheRealWaldo/thermal/commits/main
 [commits-shield]: https://img.shields.io/github/commit-activity/m/therealwaldo/thermal?style=for-the-badge
