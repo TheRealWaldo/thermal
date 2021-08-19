@@ -13,6 +13,7 @@ class ThermalVisionClient(object):
 
         self._pixels = None
         self._temp = None
+        self._person_detected = None
 
     def call(self):
         response = requests.get(
@@ -29,6 +30,11 @@ class ThermalVisionClient(object):
         else:
             self._temp = None
 
+        if "person_detected" in decoded:
+            self._person_detected = decoded["person_detected"]
+        else:
+            self._person_detected = None
+
         self._pixels = list(map(lambda x: float(x), decoded["data"].split(",")))
 
     def get_temp(self):
@@ -36,3 +42,6 @@ class ThermalVisionClient(object):
 
     def get_raw(self):
         return self._pixels
+
+    def get_person_detected(self):
+        return self._person_detected

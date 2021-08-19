@@ -36,6 +36,7 @@ ATTR_MIN = "min"
 ATTR_MAX = "max"
 ATTR_AVG = "average"
 ATTR_SENSOR_TEMP = "sensor_temp"
+ATTR_PERSON_DETECTED = "person_detected"
 
 DEFAULT_NAME = "Thermal Vision"
 DEFAULT_VERIFY_SSL = False
