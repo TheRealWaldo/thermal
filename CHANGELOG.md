@@ -1,5 +1,12 @@
 # Changelog
 
+### [2.4.1](https://www.github.com/TheRealWaldo/thermal/compare/v2.4.0...v2.4.1) (2021-08-26)
+
+
+### Bug Fixes
+
+* sensor would not start ([3402fdc](https://www.github.com/TheRealWaldo/thermal/commit/3402fdcec5cb50d21a2f2dc514961492dcd18b22))
+
 ## [2.4.0](https://www.github.com/TheRealWaldo/thermal/compare/v2.3.0...v2.4.0) (2021-08-19)
 
 
