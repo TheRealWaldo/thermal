@@ -19,7 +19,7 @@ homeassistant:
 sensor:
   - platform: thermal_vision
     name: Thermal Vision Sensor
-    host: http://192.168.3.91
+    host: http://192.168.3.94
 
 input_text:
   psuedo_pixels:
@@ -29,7 +29,7 @@ input_text:
 camera:
   - platform: thermal_vision
     name: Thermal Vision Camera
-    host: http://192.168.3.91
+    host: http://192.168.3.94
     scan_interval: 2
     auto_range: true
     mirror: true

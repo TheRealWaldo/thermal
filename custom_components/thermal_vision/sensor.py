@@ -108,7 +108,7 @@ class ThermalVisionSensor(Entity):
 
         self._verify_ssl = config.get(CONF_VERIFY_SSL)
         self._client = ThermalVisionClient(config.get(CONF_HOST), self._verify_ssl)
-
+        self._person_detected = False
         self._temperature_unit = hass.config.units.temperature_unit
 
         self._state = None
