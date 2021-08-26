@@ -20,6 +20,8 @@ sensor:
   - platform: thermal_vision
     name: Thermal Vision Sensor
     host: http://192.168.3.94
+    state: person_detected
+    scan_interval: 1
 
 input_text:
   psuedo_pixels:

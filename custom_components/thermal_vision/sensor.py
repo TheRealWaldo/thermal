@@ -108,7 +108,7 @@ class ThermalVisionSensor(Entity):
 
         self._verify_ssl = config.get(CONF_VERIFY_SSL)
         self._client = ThermalVisionClient(config.get(CONF_HOST), self._verify_ssl)
-        self._person_detected = False
+        self._person_detected = None
         self._temperature_unit = hass.config.units.temperature_unit
 
         self._state = None
@@ -169,13 +169,18 @@ class ThermalVisionSensor(Entity):
     @property
     def unit_of_measurement(self):
         """Return the unit of measurement."""
-
-        return self._temperature_unit
+        if self._state_type == ATTR_PERSON_DETECTED:
+            return None
+        else:
+            return self._temperature_unit
 
     @property
     def device_class(self):
-        """Return the unit of measurement."""
-        return DEVICE_CLASS_TEMPERATURE
+        """Return the device class."""
+        if self._state_type == ATTR_PERSON_DETECTED:
+            return None
+        else:
+            return DEVICE_CLASS_TEMPERATURE
 
     @property
     def device_state_attributes(self):
@@ -204,9 +209,9 @@ class ThermalVisionSensor(Entity):
         elif self._state_type == ATTR_AVG:
             self._state = self._average_temp
         elif self._state_type == ATTR_SENSOR_TEMP:
-            self.state = self._sensor_temp
+            self._state = self._sensor_temp
         elif self._state_type == ATTR_PERSON_DETECTED:
-            self.state = self._person_detected
+            self._state = self._person_detected
 
         if self._state is None:
             self._available = False
