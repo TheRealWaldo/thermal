@@ -1,5 +1,17 @@
 # Changelog
 
+## [2.5.0](https://www.github.com/TheRealWaldo/thermal/compare/v2.4.2...v2.5.0) (2021-09-07)
+
+
+### Features
+
+* allow for min_diff when auto_range enabled ([f2a2e3c](https://www.github.com/TheRealWaldo/thermal/commit/f2a2e3c07891eb5a708f15c8140310b7b560d2b5))
+
+
+### Documentation
+
+* update HACS install steps ([967791a](https://www.github.com/TheRealWaldo/thermal/commit/967791add722b99768d59e79626b91aa867c7a70))
+
 ### [2.4.2](https://www.github.com/TheRealWaldo/thermal/compare/v2.4.1...v2.4.2) (2021-08-26)
 
 
