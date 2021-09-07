@@ -167,6 +167,11 @@ class ThermalVisionSensor(Entity):
         return self._state
 
     @property
+    def state_class(self):
+        """Return the state class of the sensor."""
+        return "measurement"
+
+    @property
     def unit_of_measurement(self):
         """Return the unit of measurement."""
         if self._state_type == ATTR_PERSON_DETECTED:
