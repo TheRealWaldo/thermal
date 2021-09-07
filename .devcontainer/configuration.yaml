@@ -9,7 +9,7 @@ logger:
 # debugpy:
 
 homeassistant:
-  unit_system: imperial
+  unit_system: metric
   temperature_unit: C
   time_zone: America/Edmonton
   elevation: 1045
@@ -36,6 +36,7 @@ camera:
     auto_range: true
     mirror: true
     overlay: true
+    min_diff: 4
 
   - platform: thermal_vision
     name: Thermal Vision Camera from ESPHome Sensor

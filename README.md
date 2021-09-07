@@ -84,6 +84,7 @@ camera:
 | `min_temp` | No | Min temperature **Default**: `26`
 | `max_temp` | No | Max temperature **Default**: `32`
 | `auto_range` | No | Rather than use a static minimum and maximum temperature, auto adjust based on the content ***Default***: `false`
+| `min_diff` | No | Minimum difference when auto-ranging.  Favors cold.  ***Default***: `4`
 | `sensor` | No | Sensor related configurations (see below)
 | `interpolate` | No | Interpolation related configurations (see below)
 | `cold_color` | No | Cold color **Default**: `indigo`

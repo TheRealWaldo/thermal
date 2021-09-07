@@ -44,6 +44,7 @@ from .const import (
     CONF_HEIGHT,
     CONF_METHOD,
     CONF_AUTO_RANGE,
+    CONF_MIN_DIFFERANCE,
     CONF_MIN_TEMPERATURE,
     CONF_MAX_TEMPERATURE,
     CONF_ROTATE,
@@ -83,6 +84,7 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
         vol.Optional(CONF_WIDTH, default=DEFAULT_IMAGE_WIDTH): cv.positive_int,
         vol.Optional(CONF_HEIGHT, default=DEFAULT_IMAGE_HEIGHT): cv.positive_int,
         vol.Optional(CONF_AUTO_RANGE, default=False): cv.boolean,
+        vol.Optional(CONF_MIN_DIFFERANCE, default=4): cv.positive_int,
         vol.Optional(CONF_MIN_TEMPERATURE, default=DEFAULT_MIN_TEMPERATURE): vol.All(
             vol.Coerce(float), vol.Range(min=0, max=100), msg="invalid min temperature"
         ),
@@ -148,6 +150,7 @@ class ThermalVisionCamera(Camera):
         self._format = config.get(CONF_FORMAT)
         self._session_timeout = config.get(CONF_SESSION_TIMEOUT)
         self._overlay = config.get(CONF_OVERLAY)
+        self._min_diff = config.get(CONF_MIN_DIFFERANCE)
         self._fps = None
         self._temperature_unit = hass.config.units.temperature_unit
         _LOGGER.debug("Temperature unit %s", self._temperature_unit)
@@ -287,6 +290,10 @@ class ThermalVisionCamera(Camera):
             ):
                 self._min_temperature = self._pixel_min_temp
                 self._max_temperature = self._pixel_max_temp
+                diff = self._max_temperature - self._min_temperature
+
+                if diff < self._min_diff:
+                    self._max_temperature = self._min_temperature + self._min_diff
 
     def _setup_default_image(self):
         """Set up a default image"""
