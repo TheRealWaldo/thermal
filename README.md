@@ -78,6 +78,7 @@ camera:
 | `verify_ssl` | No | Verify SSL or not **Default**: `false`
 | `width` | No | Image width in pixels **Default**: `640`
 | `height` | No | Image height in pixels **Default**: `640`
+| `preserve_aspect_ratio` | No | Preserve aspect ratio (ignores height) **Default**: `true`
 | `rotate` | No | Rotate image **Default**: `0`
 | `mirror` | No | Mirror image true / false **Default**: `false`
 | `format` | No | Camera image format (`jpeg`, `png`) **Default**: `jpeg`

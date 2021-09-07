@@ -42,6 +42,7 @@ from .const import (
     DEFAULT_SESSION_TIMEOUT,
     CONF_WIDTH,
     CONF_HEIGHT,
+    CONF_PRESERVE_ASPECT_RATIO,
     CONF_METHOD,
     CONF_AUTO_RANGE,
     CONF_MIN_DIFFERANCE,
@@ -61,6 +62,7 @@ from .const import (
     DEFAULT_VERIFY_SSL,
     DEFAULT_IMAGE_WIDTH,
     DEFAULT_IMAGE_HEIGHT,
+    DEFAULT_PRESERVE_ASPECT_RATIO,
     DEFAULT_METHOD,
     DEFAULT_MIN_TEMPERATURE,
     DEFAULT_MAX_TEMPERATURE,
@@ -83,6 +85,9 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
         vol.Optional(CONF_VERIFY_SSL, default=DEFAULT_VERIFY_SSL): cv.boolean,
         vol.Optional(CONF_WIDTH, default=DEFAULT_IMAGE_WIDTH): cv.positive_int,
         vol.Optional(CONF_HEIGHT, default=DEFAULT_IMAGE_HEIGHT): cv.positive_int,
+        vol.Optional(
+            CONF_PRESERVE_ASPECT_RATIO, default=DEFAULT_PRESERVE_ASPECT_RATIO
+        ): cv.boolean,
         vol.Optional(CONF_AUTO_RANGE, default=False): cv.boolean,
         vol.Optional(CONF_MIN_DIFFERANCE, default=4): cv.positive_int,
         vol.Optional(CONF_MIN_TEMPERATURE, default=DEFAULT_MIN_TEMPERATURE): vol.All(
@@ -140,6 +145,7 @@ class ThermalVisionCamera(Camera):
 
         self._image_width = config.get(CONF_WIDTH)
         self._image_height = config.get(CONF_HEIGHT)
+        self._preserve_aspect_ratio = config.get(CONF_PRESERVE_ASPECT_RATIO)
         self._min_temperature = config.get(CONF_MIN_TEMPERATURE)
         self._max_temperature = config.get(CONF_MAX_TEMPERATURE)
         self._pixel_min_temp = self._min_temperature
@@ -215,8 +221,9 @@ class ThermalVisionCamera(Camera):
             else util.temperature.celsius_to_fahrenheit(self._max_temperature),
         }
 
-    async def async_camera_image(self):
+    async def async_camera_image(self, width=None, height=None):
         """Pull image from camera"""
+        self._set_size(width, height)
         if self._host:
             start = int(round(time.time() * 1000))
             websession = async_get_clientsession(self.hass, verify_ssl=self._verify_ssl)
@@ -249,14 +256,27 @@ class ThermalVisionCamera(Camera):
 
         return self._default_image
 
-    def camera_image(self):
+    def camera_image(self, width=None, height=None):
         """Get image for camera"""
+        self._set_size(width, height)
+
         if self._host:
             self._client.call()
             return self._camera_image(self._client.get_raw())
         else:
             self._update_pixel_sensor()
             return self._default_image
+
+    def _set_size(self, width=None, height=None):
+        """Set output image size"""
+        if width:
+            self._image_width = width
+
+        if self._preserve_aspect_ratio and width:
+            self._image_height = int(width * (self._rows / self._cols))
+        else:
+            if height:
+                self._image_height = height
 
     def _update_pixel_sensor(self):
         """Decode pixels from sensor and update camera image"""
