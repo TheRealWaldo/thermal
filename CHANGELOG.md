@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.6.0](https://www.github.com/TheRealWaldo/thermal/compare/v2.5.0...v2.6.0) (2021-09-07)
+
+
+### Features
+
+* support scaling, preserve aspect ratio ([0d02ea0](https://www.github.com/TheRealWaldo/thermal/commit/0d02ea05dc0f46d8db0a488d703bf7776b843add))
+
 ## [2.5.0](https://www.github.com/TheRealWaldo/thermal/compare/v2.4.2...v2.5.0) (2021-09-07)
 
 
