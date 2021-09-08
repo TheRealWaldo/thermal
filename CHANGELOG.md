@@ -1,5 +1,18 @@
 # Changelog
 
+## [3.0.0](https://www.github.com/TheRealWaldo/thermal/compare/v2.6.0...v3.0.0) (2021-09-08)
+
+
+### ⚠ BREAKING CHANGES
+
+* Using `person_detected` as a state on a sensor is deprecated and will be removed in future versions.  Use the new Binary Sensor instead.
+
+### Features
+
+* add state_class to sensor ([8019b86](https://www.github.com/TheRealWaldo/thermal/commit/8019b869a7d7f03246e85cc0cf4cb2814fe0da61))
+* introduce binary_sensor for occupancy ([f0ee349](https://www.github.com/TheRealWaldo/thermal/commit/f0ee349c4d0f92c42929d4589f9b0121ce02c097))
+* use hass native unit of measurement ([247487d](https://www.github.com/TheRealWaldo/thermal/commit/247487d7a873130a5a659d343e4279d53d219c3b))
+
 ## [2.6.0](https://www.github.com/TheRealWaldo/thermal/compare/v2.5.0...v2.6.0) (2021-09-07)
 
 
