@@ -139,7 +139,7 @@ sensor:
 | `scan_interval` | No | Get raw data interval in seconds **Default**: `60`
 | `sensor` | No | Sensor related configurations (see below)
 | `roi` | No | Sensor region of interest (see below)
-| `state` | No | Sensor state type (`average`, `max`, `min`, `sensor_temp`, `person_detected`) **Default**: `average`
+| `state` | No | Sensor state type (`average`, `max`, `min`, `sensor_temp`, `person_detected` (*deprecated, use `binary_sensor`*)) **Default**: `average`
 
 Sensor
 
@@ -175,7 +175,33 @@ All values are affected by the ROI configuration.
 | `min_index` | The index where the min temperature was detected (1 Dimensional)
 | `max_index` | The index where the max temperature was detected (1 Dimensional)
 | `sensor_temp` | The temperature of the sensor itself (if the sensor provides it)
-| `person_detected` | A boolean representing whether the sensor detected a person or not.  Must use latest firmware!
+| `person_detected` | A boolean representing whether the sensor detected a person or not.  Must use latest firmware! (*deprecated, use `binary_sensor`*)
+
+### Binary Sensor
+
+```yaml
+# Example configuration.yaml entry
+
+binary_sensor:
+  - platform: thermal_vision
+    host: http://192.168.0.10
+```
+
+#### Main Options
+
+|Parameter |Required|Description
+|:---|---|---
+| `platform` | Yes | Platform name `thermal_vision`
+| `name` | No | Friendly name **Default**: `Thermal Vision`
+| `host` | Yes | IP address of your Thermal sensor server
+| `verify_ssl` | No | Verify SSL or not **Default**: `false`
+| `scan_interval` | No | Get raw data interval in seconds **Default**: `60`
+
+#### State and Attributes
+
+##### State
+
+Returns `on` when the sensor claims to detect a person, `off` when it does not.  Device class is `occupancy`.
 
 [commits]: https://github.com/TheRealWaldo/thermal/commits/main
 [commits-shield]: https://img.shields.io/github/commit-activity/m/therealwaldo/thermal?style=for-the-badge
