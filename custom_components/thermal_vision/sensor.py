@@ -21,7 +21,7 @@ from homeassistant.const import (
     CONF_SCAN_INTERVAL,
     DEVICE_CLASS_TEMPERATURE,
     CONF_VERIFY_SSL,
-    TEMP_FAHRENHEIT,
+    TEMP_CELSIUS,
 )
 
 from .const import (
@@ -109,7 +109,6 @@ class ThermalVisionSensor(Entity):
         self._verify_ssl = config.get(CONF_VERIFY_SSL)
         self._client = ThermalVisionClient(config.get(CONF_HOST), self._verify_ssl)
         self._person_detected = None
-        self._temperature_unit = hass.config.units.temperature_unit
 
         self._state = None
         self._icon = "mdi:grid"
@@ -166,7 +165,7 @@ class ThermalVisionSensor(Entity):
         return self._name
 
     @property
-    def state(self):
+    def native_value(self):
         """Return the state of the sensor."""
         return self._state
 
@@ -176,12 +175,12 @@ class ThermalVisionSensor(Entity):
         return "measurement"
 
     @property
-    def unit_of_measurement(self):
+    def native_unit_of_measurement(self):
         """Return the unit of measurement."""
         if self._state_type == ATTR_PERSON_DETECTED:
             return None
         else:
-            return self._temperature_unit
+            return TEMP_CELSIUS
 
     @property
     def device_class(self):
@@ -246,17 +245,6 @@ class ThermalVisionSensor(Entity):
 
             self._min_index = np.argmin(pixels).item()
             self._max_index = np.argmax(pixels).item()
-
-            if self._temperature_unit == TEMP_FAHRENHEIT:
-                self._average_temp = util.temperature.celsius_to_fahrenheit(
-                    self._average_temp
-                )
-                self._min_temp = util.temperature.celsius_to_fahrenheit(self._min_temp)
-                self._max_temp = util.temperature.celsius_to_fahrenheit(self._max_temp)
-                if not self._sensor_temp is None:
-                    self._sensor_temp = util.temperature.celsius_to_fahrenheit(
-                        self._sensor_temp
-                    )
 
             self._set_state()
 
