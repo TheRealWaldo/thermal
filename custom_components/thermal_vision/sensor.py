@@ -122,6 +122,10 @@ class ThermalVisionSensor(Entity):
         self._sensor_temp = None
 
         self._state_type = config.get(CONF_STATE)
+        if self._state_type == ATTR_PERSON_DETECTED:
+            _LOGGER.warning(
+                f"Thermal Vision Sensor ({self._name}) using the state of {ATTR_PERSON_DETECTED} is deprecated.  Use new binary_sensor."
+            )
 
         sensor = config.get(CONF_SENSOR)
         if sensor:
