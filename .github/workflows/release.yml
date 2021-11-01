@@ -1,0 +1,16 @@
+on:
+  push:
+    branches:
+      - main
+
+name: release
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: TheRealWaldo/quick-release@v0.1.1
+        with:
+          token: ${{ secrets.AUTO_PAT }}
+          replace-files: custom_components/thermal_vision/const.py,custom_components/thermal_vision/manifest.json
+          git-user-email: 68967746+TRW-bot@users.noreply.github.com
+          assignees: TheRealWaldo
