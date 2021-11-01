@@ -49,3 +49,11 @@ camera:
     pixel_sensor: input_text.psuedo_pixels
     auto_range: true
     overlay: true
+
+  - platform: thermal_vision
+    name: Thermal Vision Camera from ESPHome Sensor with interpolation disabled
+    pixel_sensor: input_text.psuedo_pixels
+    auto_range: true
+    overlay: true
+    interpolate:
+      method: disabled
