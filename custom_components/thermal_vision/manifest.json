@@ -4,7 +4,7 @@
   "issue_tracker": "https://github.com/TheRealWaldo/thermal/issues",
   "documentation": "https://github.com/TheRealWaldo/thermal/blob/main/README.md",
   "dependencies": [],
-  "version": "3.0.0",
+  "version": "v3.0.0",
   "codeowners": ["@TheRealWaldo"],
   "requirements": ["colour", "numpy", "pillow"],
   "iot_class": "local_polling"
