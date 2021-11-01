@@ -97,7 +97,7 @@ Interpolate
 
 |Parameter |Required|Description
 |:---|---|---
-| `method` | No | Interpolation method (`bicubic`, `linear`) **Default**: `bicubic`
+| `method` | No | Interpolation method (`bicubic`, `linear`, `disabled`) **Default**: `bicubic`
 | `rows` | No | Number of rows in interpolated data **Default**: `32`
 | `cols` | No | Number of columns of interpolated data **Default**: `32`
 
@@ -202,6 +202,22 @@ binary_sensor:
 ##### State
 
 Returns `on` when the sensor claims to detect a person, `off` when it does not.  Device class is `occupancy`.
+
+
+## Known Issues
+
+Interpolation only works with sensors that have even dimensions (i.e. 8x8, 64x64, etc.).  A work-around is to disable interpolation:
+
+```yaml
+camera:
+  - platform: thermal_vision
+    host: http://192.168.0.10
+    sensor:
+      rows: 24
+      cols: 32
+    interpolate:
+      method: disabled
+```
 
 [commits]: https://github.com/TheRealWaldo/thermal/commits/main
 [commits-shield]: https://img.shields.io/github/commit-activity/m/therealwaldo/thermal?style=for-the-badge

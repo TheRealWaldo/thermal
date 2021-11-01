@@ -342,28 +342,43 @@ class ThermalVisionCamera(Camera):
         # Mirror
         if self._mirror:
             pixels = np.flip(pixels, 1)
-        # Input / output grid
-        xi = np.linspace(0, self._cols - 1, self._cols)
-        yi = np.linspace(0, self._rows - 1, self._rows)
-        xo = np.linspace(0, self._cols - 1, self._interpolate_cols)
-        yo = np.linspace(0, self._rows - 1, self._interpolate_rows)
-        # Interpolate
-        interpolation = interpolate(xi, yi, pixels, xo, yo, self._method)
-        # Draw surface
-        image = Image.new("RGB", (self._image_width, self._image_height))
-        draw = ImageDraw.Draw(image)
-        # Pixel size
-        pixel_width = self._image_width / self._interpolate_cols
-        pixel_height = self._image_height / self._interpolate_rows
-        # Draw intepolated image
-        for y, row in enumerate(interpolation):
-            for x, pixel in enumerate(row):
-                color_index = constrain(int(pixel), 0, self._color_depth - 1)
-                x0 = pixel_width * x
-                y0 = pixel_height * y
-                x1 = x0 + pixel_width
-                y1 = y0 + pixel_height
-                draw.rectangle(((x0, y0), (x1, y1)), fill=self._colors[color_index])
+
+        if self._method != "disabled":
+            # Input / output grid
+            xi = np.linspace(0, self._cols - 1, self._cols)
+            yi = np.linspace(0, self._rows - 1, self._rows)
+            xo = np.linspace(0, self._cols - 1, self._interpolate_cols)
+            yo = np.linspace(0, self._rows - 1, self._interpolate_rows)
+            # Interpolate
+            interpolation = interpolate(xi, yi, pixels, xo, yo, self._method)
+            # Draw surface
+            image = Image.new("RGB", (self._image_width, self._image_height))
+            draw = ImageDraw.Draw(image)
+            # Pixel size
+            pixel_width = self._image_width / self._interpolate_cols
+            pixel_height = self._image_height / self._interpolate_rows
+            # Draw intepolated image
+            for y, row in enumerate(interpolation):
+                for x, pixel in enumerate(row):
+                    color_index = constrain(int(pixel), 0, self._color_depth - 1)
+                    x0 = pixel_width * x
+                    y0 = pixel_height * y
+                    x1 = x0 + pixel_width
+                    y1 = y0 + pixel_height
+                    draw.rectangle(((x0, y0), (x1, y1)), fill=self._colors[color_index])
+        else:
+            image = Image.new("RGB", (self._image_width, self._image_height))
+            draw = ImageDraw.Draw(image)
+            pixel_width = self._image_width / self._cols
+            pixel_height = self._image_height / self._rows
+            for y, row in enumerate(pixels):
+                for x, pixel in enumerate(row):
+                    color_index = constrain(int(pixel), 0, self._color_depth - 1)
+                    x0 = pixel_width * x
+                    y0 = pixel_height * y
+                    x1 = x0 + pixel_width
+                    y1 = y0 + pixel_height
+                    draw.rectangle(((x0, y0), (x1, y1)), fill=self._colors[color_index])
 
         # Add overlay
         if self._overlay:
