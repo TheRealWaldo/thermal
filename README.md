@@ -5,13 +5,9 @@
 [![GitHub Activity][commits-shield]][commits]
 [![License][license-shield]](LICENSE)
 
-The Thermal Vision integration allows for the use of the [AMG8833 sensor](https://eu.industrial.panasonic.com/products/sensors-optical-devices/sensors-automotive-and-industrial-applications/infrared-array/series/grid-eye-high-performance-type-amg8833/ADI8005/model/AMG8833) with a simple JSON interface to be used within [Home Assistant](https://www.home-assistant.io/).
+The Thermal Vision integration allows for the use of Thermal Imaging sensors in [Home Assistant](https://www.home-assistant.io/).
 
-This can be used to detect humans much more reliably than motion sensors as it does not require the subject to be moving.  It also produces a pretty thermal camera!
-
-Firmware for a simple sensor using an ESP8266 (I'm using a D1 Mini) can built using [TheRealWaldo/esp8266-amg8833](https://github.com/TheRealWaldo/esp8266-amg8833).  This firmware is still under development!
-
-Also, there's an experimental implementation using [ESPHome](https://esphome.io/) at [TheRealWaldo/AMG8833-ESPHOME](https://github.com/TheRealWaldo/AMG8833-ESPHOME).  You can leverage this by setting `pixel_sensor` to the sensor created by ESPHome and not using `host`.  Note: this only works with the camera at this time.
+These can be used to detect humans much more reliably than motion sensors as do not require the subject to be moving. They also produce a pretty thermal camera image!
 
 ![Me, waving](docs/waving.png)
 
@@ -202,6 +198,15 @@ binary_sensor:
 ##### State
 
 Returns `on` when the sensor claims to detect a person, `off` when it does not.  Device class is `occupancy`.
+
+## Sensor Hardware and Firmware
+
+Sensors are based on a simple JSON interface.
+
+|Sensor|Firmware
+|:---|---
+[AMG8833](https://eu.industrial.panasonic.com/products/sensors-optical-devices/sensors-automotive-and-industrial-applications/infrared-array/series/grid-eye-high-performance-type-amg8833/ADI8005/model/AMG8833)|Firmware for a simple sensor using an ESP8266 (I'm using a D1 Mini) can built using [TheRealWaldo/esp8266-amg8833](https://github.com/TheRealWaldo/esp8266-amg8833).  This firmware is still under development!<br><br>Also, there's an experimental implementation using [ESPHome](https://esphome.io/) at [TheRealWaldo/AMG8833-ESPHOME](https://github.com/TheRealWaldo/AMG8833-ESPHOME).  You can leverage this by setting `pixel_sensor` to the sensor created by ESPHome and not using `host`.  Note: this only works with the camera at this time.
+[MLX90640](https://www.melexis.com/en/product/MLX90640/Far-Infrared-Thermal-Sensor-Array)|Another [PlatformIO](https://platformio.org/) project using an ESP32 and the MLX90640 cab be found at [pixelsquared/thermal_vision-ESP32-MLX90640](https://github.com/pixelsquared/thermal_vision-ESP32-MLX90640).
 
 
 ## Known Issues
