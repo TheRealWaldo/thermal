@@ -14,7 +14,7 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
 
-      - uses: TheRealWaldo/quick-release@v0.1.3
+      - uses: TheRealWaldo/quick-release@v0.4.0
         with:
           token: ${{ secrets.AUTO_PAT }}
           replace-files: custom_components/thermal_vision/const.py,custom_components/thermal_vision/manifest.json
