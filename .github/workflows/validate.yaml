@@ -20,7 +20,7 @@ jobs:
 
       - name: HACS validation
         if: "github.ref == 'refs/heads/main' || (github.ref == 'refs/heads/main' && github.base_ref == 'refs/heads/release')"
-        uses: hacs/action@21.11.0
+        uses: hacs/action@21.12.1
         with:
           category: integration
 
