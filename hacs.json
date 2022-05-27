@@ -1,7 +1,6 @@
 {
   "name": "Thermal Vision",
   "country": "CA",
-  "domains": ["camera", "sensor"],
-  "render_readme": true,
-  "iot_class": ["Assumed State", "Local Polling"]
+  "homeassistant": "2021.4",
+  "render_readme": true
 }
