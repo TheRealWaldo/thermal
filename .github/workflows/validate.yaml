@@ -13,13 +13,13 @@ jobs:
       - uses: actions/checkout@v3
 
       - name: Faster HACS validation
-        if: "github.base_ref != 'refs/heads/release' && github.ref != 'refs/heads/main'"
+        if: "github.head_ref != 'refs/heads/release' && github.base_ref != 'refs/heads/main'"
         uses: TheRealWaldo/faster-hacs-action@v0.0.6
         with:
           category: integration
 
       - name: HACS validation
-        if: "github.ref == 'refs/heads/main' || (github.ref == 'refs/heads/main' && github.base_ref == 'refs/heads/release')"
+        if: "github.ref == 'refs/heads/main' || (github.base_ref == 'refs/heads/main' && github.head_ref == 'refs/heads/release')"
         uses: hacs/action@21.12.1
         with:
           category: integration
