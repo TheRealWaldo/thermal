@@ -5,6 +5,9 @@ on:
     - cron: "0 0 * * *"
   pull_request:
 
+permissions:
+  pull-requests: write
+
 jobs:
   validate:
     runs-on: ubuntu-latest
