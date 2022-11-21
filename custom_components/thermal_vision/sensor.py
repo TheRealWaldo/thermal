@@ -12,7 +12,6 @@ from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers.config_validation import PLATFORM_SCHEMA
 from homeassistant.helpers.entity import Entity
 
-from homeassistant import util
 from homeassistant.util import Throttle
 
 from homeassistant.const import (
