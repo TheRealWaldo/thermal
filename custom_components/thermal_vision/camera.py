@@ -15,7 +15,7 @@ import voluptuous as vol
 from colour import Color
 from PIL import Image, ImageDraw
 
-from homeassistant import util
+from homeassistant.util.unit_conversion import TemperatureConverter
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
 from homeassistant.components.camera import PLATFORM_SCHEMA, Camera
@@ -26,6 +26,7 @@ from homeassistant.const import (
     CONF_NAME,
     CONF_VERIFY_SSL,
     TEMP_CELSIUS,
+    TEMP_FAHRENHEIT,
     STATE_UNKNOWN,
     STATE_UNAVAILABLE,
 )
@@ -209,16 +210,24 @@ class ThermalVisionCamera(Camera):
             "fps": self._fps,
             "min": self._pixel_min_temp
             if self._temperature_unit == TEMP_CELSIUS
-            else util.temperature.celsius_to_fahrenheit(self._pixel_min_temp),
+            else TemperatureConverter.convert(
+                self._pixel_min_temp, TEMP_CELSIUS, TEMP_FAHRENHEIT
+            ),
             "max": self._pixel_max_temp
             if self._temperature_unit == TEMP_CELSIUS
-            else util.temperature.celsius_to_fahrenheit(self._pixel_max_temp),
+            else TemperatureConverter.convert(
+                self._pixel_max_temp, TEMP_CELSIUS, TEMP_FAHRENHEIT
+            ),
             "range_min": self._min_temperature
             if self._temperature_unit == TEMP_CELSIUS
-            else util.temperature.celsius_to_fahrenheit(self._min_temperature),
+            else TemperatureConverter.convert(
+                self._min_temperature, TEMP_CELSIUS, TEMP_FAHRENHEIT
+            ),
             "range_max": self._max_temperature
             if self._temperature_unit == TEMP_CELSIUS
-            else util.temperature.celsius_to_fahrenheit(self._max_temperature),
+            else TemperatureConverter.convert(
+                self._max_temperature, TEMP_CELSIUS, TEMP_FAHRENHEIT
+            ),
         }
 
     async def async_camera_image(self, width=None, height=None):
@@ -385,22 +394,30 @@ class ThermalVisionCamera(Camera):
             min_temp = (
                 self._pixel_min_temp
                 if self._temperature_unit == TEMP_CELSIUS
-                else util.temperature.celsius_to_fahrenheit(self._pixel_min_temp)
+                else TemperatureConverter.convert(
+                    self._pixel_min_temp, TEMP_CELSIUS, TEMP_FAHRENHEIT
+                )
             )
             max_temp = (
                 self._pixel_max_temp
                 if self._temperature_unit == TEMP_CELSIUS
-                else util.temperature.celsius_to_fahrenheit(self._pixel_max_temp)
+                else TemperatureConverter.convert(
+                    self._pixel_max_temp, TEMP_CELSIUS, TEMP_FAHRENHEIT
+                )
             )
             min_temperature = (
                 self._min_temperature
                 if self._temperature_unit == TEMP_CELSIUS
-                else util.temperature.celsius_to_fahrenheit(self._min_temperature)
+                else TemperatureConverter.convert(
+                    self._min_temperature, TEMP_CELSIUS, TEMP_FAHRENHEIT
+                )
             )
             max_temperature = (
                 self._max_temperature
                 if self._temperature_unit == TEMP_CELSIUS
-                else util.temperature.celsius_to_fahrenheit(self._max_temperature)
+                else TemperatureConverter.convert(
+                    self._max_temperature, TEMP_CELSIUS, TEMP_FAHRENHEIT
+                )
             )
 
             draw.multiline_text(
