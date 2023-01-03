@@ -14,11 +14,12 @@ from homeassistant.helpers.entity import Entity
 
 from homeassistant.util import Throttle
 
+from homeassistant.components.sensor import SensorDeviceClass
+
 from homeassistant.const import (
     CONF_NAME,
     CONF_HOST,
     CONF_SCAN_INTERVAL,
-    DEVICE_CLASS_TEMPERATURE,
     CONF_VERIFY_SSL,
     TEMP_CELSIUS,
 )
@@ -187,7 +188,7 @@ class ThermalVisionSensor(Entity):
         if self._state_type == ATTR_PERSON_DETECTED:
             return None
         else:
-            return DEVICE_CLASS_TEMPERATURE
+            return SensorDeviceClass.TEMPERATURE
 
     @property
     def extra_state_attributes(self):
