@@ -17,7 +17,7 @@ jobs:
 
       - name: Faster HACS validation
         if: "github.head_ref != 'release' || github.base_ref != 'main'"
-        uses: TheRealWaldo/faster-hacs-action@v0.0.6
+        uses: TheRealWaldo/faster-hacs-action@v0.0.7
         with:
           category: integration
 
