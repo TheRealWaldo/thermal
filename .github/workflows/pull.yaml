@@ -28,7 +28,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         uses: wagoid/commitlint-github-action@v5.4.1
 
-      - uses: actions/setup-python@v4.5.0
+      - uses: actions/setup-python@v4.6.1
         with:
           python-version: "3.x"
 
