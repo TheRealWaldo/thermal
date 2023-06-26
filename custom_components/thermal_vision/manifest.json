@@ -1,11 +1,11 @@
 {
   "domain": "thermal_vision",
   "name": "Thermal Vision",
-  "issue_tracker": "https://github.com/TheRealWaldo/thermal/issues",
-  "documentation": "https://github.com/TheRealWaldo/thermal/blob/main/README.md",
-  "dependencies": [],
-  "version": "v3.1.4",
   "codeowners": ["@TheRealWaldo"],
+  "dependencies": [],
+  "documentation": "https://github.com/TheRealWaldo/thermal/blob/main/README.md",
+  "iot_class": "local_polling",
+  "issue_tracker": "https://github.com/TheRealWaldo/thermal/issues",
   "requirements": ["colour", "numpy", "pillow"],
-  "iot_class": "local_polling"
+  "version": "v3.1.4"
 }
