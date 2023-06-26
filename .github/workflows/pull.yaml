@@ -35,3 +35,24 @@ jobs:
       - run: python3 -m pip install black
 
       - run: black .
+
+  dependabot:
+    runs-on: ubuntu-latest
+    if: ${{ github.actor == 'dependabot[bot]' }}
+    needs:
+      - style
+    permissions:
+      pull-requests: write
+      contents: write
+    steps:
+      - name: Fetch Dependabot Metadata
+        id: dependabot-metadata
+        uses: dependabot/fetch-metadata@v1
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Enable auto-merge for patches
+        if: ${{ steps.dependabot-metadata.outputs.update-type == 'version-update:semver-patch' }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh pr merge --auto --rebase --delete-branch "${{ github.event.pull_request.html_url }}"
