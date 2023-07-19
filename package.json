@@ -17,6 +17,6 @@
   },
   "homepage": "https://github.com/TheRealWaldo/thermal#readme",
   "devDependencies": {
-    "@commitlint/config-conventional": "^17.6.6"
+    "@commitlint/config-conventional": "^17.6.7"
   }
 }
