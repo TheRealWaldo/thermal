@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     name: Validate
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Faster HACS validation
         if: "github.head_ref != 'release' || github.base_ref != 'main'"
