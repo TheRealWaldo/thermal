@@ -13,9 +13,7 @@ jobs:
           fetch-depth: 0
 
       - name: Setup node.js
-        uses: actions/setup-node@v3.7.0
-        with:
-          node-version: 14
+        uses: actions/setup-node@v4
 
       - name: Install dependencies
         run: npm ci
@@ -26,11 +24,11 @@ jobs:
       - name: Commit Linter
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        uses: wagoid/commitlint-github-action@v5.4.3
+        uses: wagoid/commitlint-github-action@v6.0.1
 
-      - uses: actions/setup-python@v4.7.0
+      - uses: actions/setup-python@v5
         with:
-          python-version: "3.x"
+          python-version: "3.12"
 
       - run: python3 -m pip install black
 
