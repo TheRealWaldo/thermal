@@ -1,6 +1,8 @@
 auto_scale:
-  description: Scale temperature range to current min / max
+  name: "Auto Scale"
+  description: "Scale temperature range to current min / max"
   fields:
     entity_id:
-      description: Camera or sensor entity id
+      name: "Entity ID"
+      description: "Camera or sensor entity id"
       example: camera.thermal_vision
