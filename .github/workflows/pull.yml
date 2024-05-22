@@ -53,7 +53,7 @@ jobs:
     steps:
       - name: Fetch Dependabot Metadata
         id: dependabot-metadata
-        uses: dependabot/fetch-metadata@v1
+        uses: dependabot/fetch-metadata@v2
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
