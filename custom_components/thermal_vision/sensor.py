@@ -21,7 +21,7 @@ from homeassistant.const import (
     CONF_HOST,
     CONF_SCAN_INTERVAL,
     CONF_VERIFY_SSL,
-    TEMP_CELSIUS,
+    UnitOfTemperature,
 )
 
 from .const import (
@@ -180,7 +180,7 @@ class ThermalVisionSensor(Entity):
         if self._state_type == ATTR_PERSON_DETECTED:
             return None
         else:
-            return TEMP_CELSIUS
+            return UnitOfTemperature.CELSIUS
 
     @property
     def device_class(self):
