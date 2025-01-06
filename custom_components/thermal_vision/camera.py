@@ -25,8 +25,7 @@ from homeassistant.const import (
     CONF_HOST,
     CONF_NAME,
     CONF_VERIFY_SSL,
-    TEMP_CELSIUS,
-    TEMP_FAHRENHEIT,
+    UnitOfTemperature,
     STATE_UNKNOWN,
     STATE_UNAVAILABLE,
 )
@@ -209,24 +208,24 @@ class ThermalVisionCamera(Camera):
         return {
             "fps": self._fps,
             "min": self._pixel_min_temp
-            if self._temperature_unit == TEMP_CELSIUS
+            if self._temperature_unit == UnitOfTemperature.CELSIUS
             else TemperatureConverter.convert(
-                self._pixel_min_temp, TEMP_CELSIUS, TEMP_FAHRENHEIT
+                self._pixel_min_temp, UnitOfTemperature.CELSIUS, UnitOfTemperature.FAHRENHEIT
             ),
             "max": self._pixel_max_temp
-            if self._temperature_unit == TEMP_CELSIUS
+            if self._temperature_unit == UnitOfTemperature.CELSIUS
             else TemperatureConverter.convert(
-                self._pixel_max_temp, TEMP_CELSIUS, TEMP_FAHRENHEIT
+                self._pixel_max_temp, UnitOfTemperature.CELSIUS, UnitOfTemperature.FAHRENHEIT
             ),
             "range_min": self._min_temperature
-            if self._temperature_unit == TEMP_CELSIUS
+            if self._temperature_unit == UnitOfTemperature.CELSIUS
             else TemperatureConverter.convert(
-                self._min_temperature, TEMP_CELSIUS, TEMP_FAHRENHEIT
+                self._min_temperature, UnitOfTemperature.CELSIUS, UnitOfTemperature.FAHRENHEIT
             ),
             "range_max": self._max_temperature
-            if self._temperature_unit == TEMP_CELSIUS
+            if self._temperature_unit == UnitOfTemperature.CELSIUS
             else TemperatureConverter.convert(
-                self._max_temperature, TEMP_CELSIUS, TEMP_FAHRENHEIT
+                self._max_temperature, UnitOfTemperature.CELSIUS, UnitOfTemperature.FAHRENHEIT
             ),
         }
 
@@ -393,30 +392,30 @@ class ThermalVisionCamera(Camera):
         if self._overlay:
             min_temp = (
                 self._pixel_min_temp
-                if self._temperature_unit == TEMP_CELSIUS
+                if self._temperature_unit == UnitOfTemperature.CELSIUS
                 else TemperatureConverter.convert(
-                    self._pixel_min_temp, TEMP_CELSIUS, TEMP_FAHRENHEIT
+                    self._pixel_min_temp, UnitOfTemperature.CELSIUS, UnitOfTemperature.FAHRENHEIT
                 )
             )
             max_temp = (
                 self._pixel_max_temp
-                if self._temperature_unit == TEMP_CELSIUS
+                if self._temperature_unit == UnitOfTemperature.CELSIUS
                 else TemperatureConverter.convert(
-                    self._pixel_max_temp, TEMP_CELSIUS, TEMP_FAHRENHEIT
+                    self._pixel_max_temp, UnitOfTemperature.CELSIUS, UnitOfTemperature.FAHRENHEIT
                 )
             )
             min_temperature = (
                 self._min_temperature
-                if self._temperature_unit == TEMP_CELSIUS
+                if self._temperature_unit == UnitOfTemperature.CELSIUS
                 else TemperatureConverter.convert(
-                    self._min_temperature, TEMP_CELSIUS, TEMP_FAHRENHEIT
+                    self._min_temperature, UnitOfTemperature.CELSIUS, UnitOfTemperature.FAHRENHEIT
                 )
             )
             max_temperature = (
                 self._max_temperature
-                if self._temperature_unit == TEMP_CELSIUS
+                if self._temperature_unit == UnitOfTemperature.CELSIUS
                 else TemperatureConverter.convert(
-                    self._max_temperature, TEMP_CELSIUS, TEMP_FAHRENHEIT
+                    self._max_temperature, UnitOfTemperature.CELSIUS, UnitOfTemperature.FAHRENHEIT
                 )
             )
 
