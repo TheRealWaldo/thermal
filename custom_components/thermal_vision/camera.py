@@ -7,7 +7,6 @@ import async_timeout
 
 import io
 import time
-import base64
 
 import numpy as np
 import voluptuous as vol
@@ -35,6 +34,8 @@ from .interpolate import interpolate
 from urllib.parse import urljoin
 from .client import ThermalVisionClient
 
+from .pixel_decoder import decode_pixels
+
 from .const import (
     CONF_OVERLAY,
     CONF_SESSION_TIMEOUT,
@@ -50,6 +51,8 @@ from .const import (
     CONF_MAX_TEMPERATURE,
     CONF_ROTATE,
     CONF_MIRROR,
+    CONF_MIRROR_HORIZONTAL,
+    CONF_MIRROR_VERTICAL,
     CONF_FORMAT,
     CONF_COLD_COLOR,
     CONF_HOT_COLOR,
@@ -68,6 +71,8 @@ from .const import (
     DEFAULT_MAX_TEMPERATURE,
     DEFAULT_ROTATE,
     DEFAULT_MIRROR,
+    DEFAULT_MIRROR_HORIZONTAL,
+    DEFAULT_MIRROR_VERTICAL,
     DEFAULT_FORMAT,
     DEFAULT_ROWS,
     DEFAULT_COLS,
@@ -111,7 +116,15 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
         ),
         vol.Optional(CONF_FORMAT, default=DEFAULT_FORMAT): cv.string,
         vol.Optional(CONF_MIRROR, default=DEFAULT_MIRROR): cv.boolean,
-        vol.Optional(CONF_ROTATE, default=DEFAULT_ROTATE): cv.positive_int,
+        vol.Optional(
+            CONF_MIRROR_HORIZONTAL, default=DEFAULT_MIRROR_HORIZONTAL
+        ): cv.boolean,
+        vol.Optional(
+            CONF_MIRROR_VERTICAL, default=DEFAULT_MIRROR_VERTICAL
+        ): cv.boolean,
+        vol.Optional(CONF_ROTATE, default=DEFAULT_ROTATE): vol.All(
+            vol.Coerce(int), vol.In([0, 90, 180, 270])
+        ),
         vol.Optional(CONF_COLD_COLOR, default=DEFAULT_COLD_COLOR): cv.string,
         vol.Optional(CONF_HOT_COLOR, default=DEFAULT_HOT_COLOR): cv.string,
         vol.Optional(
@@ -152,7 +165,11 @@ class ThermalVisionCamera(Camera):
         self._pixel_max_temp = self._min_temperature
         self._color_depth = 1024
         self._rotate = config.get(CONF_ROTATE)
-        self._mirror = config.get(CONF_MIRROR)
+        # Keep the legacy `mirror` option as a horizontal-mirror alias.
+        self._mirror_horizontal = config.get(CONF_MIRROR) or config.get(
+            CONF_MIRROR_HORIZONTAL
+        )
+        self._mirror_vertical = config.get(CONF_MIRROR_VERTICAL)
         self._format = config.get(CONF_FORMAT)
         self._session_timeout = config.get(CONF_SESSION_TIMEOUT)
         self._overlay = config.get(CONF_OVERLAY)
@@ -289,15 +306,15 @@ class ThermalVisionCamera(Camera):
     def _update_pixel_sensor(self):
         """Decode pixels from sensor and update camera image"""
 
-        encoded_pixels = self.hass.states.get(self._pixel_sensor).state
-        _LOGGER.debug("Decoding pixels: %s", encoded_pixels)
-        if encoded_pixels not in [STATE_UNKNOWN, STATE_UNAVAILABLE]:
-            data = []
-            for char in base64.b64decode(encoded_pixels):
-                if char & (1 << 11):
-                    char &= ~(1 << 11)
-                    char = char * -1
-                data.append(char * 0.25)
+        state = self.hass.states.get(self._pixel_sensor)
+        if state is None or state.state in [STATE_UNKNOWN, STATE_UNAVAILABLE]:
+            return
+        try:
+            data = decode_pixels(state.state, self._rows * self._cols)
+        except (ValueError, TypeError):
+            _LOGGER.warning("Invalid thermal frame encoding")
+            return
+        if data:
             self._setup_range(data)
             self._default_image = self._camera_image(data)
 
@@ -344,19 +361,22 @@ class ThermalVisionCamera(Camera):
         ]
         # Convert to 2D
         pixels = np.reshape(pixels, (self._rows, self._cols))
-        # Rotate (flip)
-        if self._rotate == 180:
-            pixels = np.flip(pixels, 0)
-        # Mirror
-        if self._mirror:
+        # Rotate clockwise in quarter turns, then mirror in display coordinates.
+        if self._rotate:
+            pixels = np.rot90(pixels, k=-(self._rotate // 90))
+        if self._mirror_horizontal:
             pixels = np.flip(pixels, 1)
+        if self._mirror_vertical:
+            pixels = np.flip(pixels, 0)
+
+        source_rows, source_cols = pixels.shape
 
         if self._method != "disabled":
             # Input / output grid
-            xi = np.linspace(0, self._cols - 1, self._cols)
-            yi = np.linspace(0, self._rows - 1, self._rows)
-            xo = np.linspace(0, self._cols - 1, self._interpolate_cols)
-            yo = np.linspace(0, self._rows - 1, self._interpolate_rows)
+            xi = np.linspace(0, source_cols - 1, source_cols)
+            yi = np.linspace(0, source_rows - 1, source_rows)
+            xo = np.linspace(0, source_cols - 1, self._interpolate_cols)
+            yo = np.linspace(0, source_rows - 1, self._interpolate_rows)
             # Interpolate
             interpolation = interpolate(xi, yi, pixels, xo, yo, self._method)
             # Draw surface
@@ -377,8 +397,8 @@ class ThermalVisionCamera(Camera):
         else:
             image = Image.new("RGB", (self._image_width, self._image_height))
             draw = ImageDraw.Draw(image)
-            pixel_width = self._image_width / self._cols
-            pixel_height = self._image_height / self._rows
+            pixel_width = self._image_width / source_cols
+            pixel_height = self._image_height / source_rows
             for y, row in enumerate(pixels):
                 for x, pixel in enumerate(row):
                     color_index = constrain(int(pixel), 0, self._color_depth - 1)
