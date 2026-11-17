@@ -51,6 +51,10 @@ Follow the instructions at https://hacs.xyz/docs/faq/custom_repositories/ using 
 3. Configure the `thermal_vision` sensor and/or camera.
 4. Restart Home Assistant.
 
+## AMG8833 full-resolution pixel frames
+
+The `pixel_sensor` input accepts both the original 64-byte unsigned frame and a 128-byte little-endian AMG8833 register frame. The full frame preserves signed temperatures and 0.25 °C resolution. Malformed, unavailable, or missing sensor states are ignored without interrupting camera generation.
+
 ## Configuration
 
 ### Camera
@@ -75,8 +79,10 @@ camera:
 | `width` | No | Image width in pixels **Default**: `640`
 | `height` | No | Image height in pixels **Default**: `640`
 | `preserve_aspect_ratio` | No | Preserve aspect ratio (ignores height) **Default**: `true`
-| `rotate` | No | Rotate image **Default**: `0`
-| `mirror` | No | Mirror image true / false **Default**: `false`
+| `rotate` | No | Rotate clockwise: `0`, `90`, `180`, or `270` **Default**: `0`
+| `mirror` | No | Legacy alias for horizontal mirroring **Default**: `false`
+| `mirror_horizontal` | No | Mirror left-to-right **Default**: `false`
+| `mirror_vertical` | No | Mirror top-to-bottom **Default**: `false`
 | `format` | No | Camera image format (`jpeg`, `png`) **Default**: `jpeg`
 | `min_temp` | No | Min temperature **Default**: `26`
 | `max_temp` | No | Max temperature **Default**: `32`
